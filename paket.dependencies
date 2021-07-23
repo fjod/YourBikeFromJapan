@@ -2,7 +2,9 @@ source https://api.nuget.org/v3/index.json
 framework: net5.0
 storage: none
 
+nuget Dapper.FSharp
 nuget Fable.Remoting.Giraffe
+nuget MySql.Data
 nuget Saturn
 nuget Expecto
 
