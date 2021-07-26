@@ -4,6 +4,10 @@ open System
 
 type Todo = { Id: Guid; Description: string }
 
+type LoginInfo = {Email:string; Password:string}
+
+type LoginResult ={Result:bool; Message:string option; Token:string}
+
 module Todo =
     let isValid (description: string) =
         String.IsNullOrWhiteSpace description |> not
@@ -18,4 +22,6 @@ module Route =
 
 type ITodosApi =
     { getTodos: unit -> Async<Todo list>
-      addTodo: Todo -> Async<Todo> }
+      addTodo: Todo -> Async<Todo>
+      loginOrRegister: LoginInfo -> Async<LoginResult>
+    }

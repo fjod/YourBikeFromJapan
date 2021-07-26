@@ -4,13 +4,23 @@ open Elmish
 open Fable.Remoting.Client
 open Shared
 
-type Model = { Todos: Todo list; Input: string }
+type Model = {
+    Todos: Todo list
+    Input: string
+    LoginState : string
+    LoginData : LoginInfo
+    Token : string
+}
 
 type Msg =
     | GotTodos of Todo list
     | SetInput of string
     | AddTodo
     | AddedTodo of Todo
+    | LoginOrRegister
+    | LogInResult of LoginResult
+    | SetEmail of string
+    | SetPassword of string
 
 let todosApi =
     Remoting.createApi ()
@@ -18,17 +28,29 @@ let todosApi =
     |> Remoting.buildProxy<ITodosApi>
 
 let init () : Model * Cmd<Msg> =
-    let model = { Todos = []; Input = "" }
+    let model = { Todos = []; Input = ""; LoginState = "not logged in"; LoginData = {Email = ""; Password = ""}; Token = "" }
 
     let cmd =
         Cmd.OfAsync.perform todosApi.getTodos () GotTodos
 
     model, cmd
 
+let getVal s =
+    match s with
+    | Some value -> value
+    | _ -> "error"
+
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
     | GotTodos todos -> { model with Todos = todos }, Cmd.none
     | SetInput value -> { model with Input = value }, Cmd.none
+    | SetEmail v ->
+        let newData = {model.LoginData with Email = v}
+        {model with LoginData = newData},Cmd.none
+    | SetPassword v ->
+        let newData = {model.LoginData with Password = v}
+        {model with LoginData = newData},Cmd.none
+
     | AddTodo ->
         let todo = Todo.create model.Input
 
@@ -40,6 +62,15 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         { model with
               Todos = model.Todos @ [ todo ] },
         Cmd.none
+    | LoginOrRegister  ->
+       let result = Cmd.OfAsync.perform todosApi.loginOrRegister model.LoginData LogInResult
+       model,result
+    | LogInResult data ->
+        { model with
+           LoginState = getVal data.Message
+           Token = data.Token            },
+        Cmd.none
+
 
 open Feliz
 open Feliz.Bulma
@@ -69,6 +100,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
         Bulma.field.div [
             field.isGrouped
             prop.children [
+
                 Bulma.control.p [
                     control.isExpanded
                     prop.children [
@@ -79,12 +111,44 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                         ]
                     ]
                 ]
+
                 Bulma.control.p [
                     Bulma.button.a [
                         color.isPrimary
                         prop.disabled (Todo.isValid model.Input |> not)
                         prop.onClick (fun _ -> dispatch AddTodo)
                         prop.text "Add"
+                    ]
+                ]
+
+                Bulma.control.p [
+                    control.isExpanded
+                    prop.children [
+                        Bulma.input.text [
+                            prop.value model.Input
+                            prop.placeholder "Email"
+                            prop.onChange (fun x -> SetEmail x |> dispatch)
+                        ]
+                    ]
+                ]
+
+                Bulma.control.p [
+                    control.isExpanded
+                    prop.children [
+                        Bulma.input.text [
+                            prop.value model.Input
+                            prop.placeholder "Password"
+                            prop.onChange (fun x -> SetPassword x |> dispatch)
+                        ]
+                    ]
+                ]
+
+                Bulma.control.p [
+                    Bulma.button.a [
+                        color.isPrimary
+                        prop.disabled (Todo.isValid model.Input |> not)
+                        prop.onClick (fun _ -> dispatch LoginOrRegister)
+                        prop.text "Login/Register"
                     ]
                 ]
             ]
