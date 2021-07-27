@@ -46,8 +46,8 @@ let todosApi =
                   | Ok () -> return todo
                   | Error e -> return failwith e
               }
-      loginOrRegister = fun t -> login(t)
-
+      login = login
+      register = register
     }
 
 let webApp =

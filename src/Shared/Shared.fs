@@ -23,7 +23,8 @@ module Route =
 type ITodosApi =
     { getTodos: unit -> Async<Todo list>
       addTodo: Todo -> Async<Todo>
-      loginOrRegister: LoginInfo -> LoginResult
+      login: LoginInfo -> LoginResult
+      register: LoginInfo -> LoginResult
     }
 
 type SecureRequest<'t> = {

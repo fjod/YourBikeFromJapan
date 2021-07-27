@@ -17,8 +17,10 @@ type Msg =
     | SetInput of string
     | AddTodo
     | AddedTodo of Todo
-    | LoginOrRegister
+    | Login
     | LogInResult of LoginResult
+    | Register
+    | RegisterResult of LoginResult
     | SetEmail of string
     | SetPassword of string
 
@@ -62,14 +64,24 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         { model with
               Todos = model.Todos @ [ todo ] },
         Cmd.none
-    | LoginOrRegister  ->
-       let result = Cmd.OfFunc.perform todosApi.loginOrRegister model.LoginData LogInResult
+    | Login  ->
+       let result = Cmd.OfFunc.perform todosApi.login model.LoginData LogInResult
        model,result
     | LogInResult data ->
         { model with
            LoginState = getVal data.Message
            Token = data.Token            },
         Cmd.none
+
+    | Register  ->
+       let result = Cmd.OfFunc.perform todosApi.login model.LoginData LogInResult
+       model,result
+    | RegisterResult data ->
+        { model with
+           LoginState = getVal data.Message
+           Token = data.Token            },
+        Cmd.none
+
 
 
 open Feliz
@@ -147,8 +159,17 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                     Bulma.button.a [
                         color.isPrimary
                         prop.disabled (Todo.isValid model.Input |> not)
-                        prop.onClick (fun _ -> dispatch LoginOrRegister)
-                        prop.text "Login/Register"
+                        prop.onClick (fun _ -> dispatch Register)
+                        prop.text "Register"
+                    ]
+                ]
+
+                Bulma.control.p [
+                    Bulma.button.a [
+                        color.isPrimary
+                        prop.disabled (Todo.isValid model.Input |> not)
+                        prop.onClick (fun _ -> dispatch Login)
+                        prop.text "Login"
                     ]
                 ]
             ]
