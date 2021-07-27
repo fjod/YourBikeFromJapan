@@ -23,5 +23,22 @@ module Route =
 type ITodosApi =
     { getTodos: unit -> Async<Todo list>
       addTodo: Todo -> Async<Todo>
-      loginOrRegister: LoginInfo -> Async<LoginResult>
+      loginOrRegister: LoginInfo -> LoginResult
     }
+
+type SecureRequest<'t> = {
+    Token : string
+    Body : 't
+}
+
+type AuthError =
+    | TokenInvalid
+    | UserUnauthorized
+type SecureResponse<'t> = Async<Result<'t, AuthError>>
+
+type DbUser = {
+    id :int
+    email : string
+    password : string
+    salt : string
+}

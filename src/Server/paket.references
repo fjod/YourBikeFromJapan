@@ -2,3 +2,5 @@ Fable.Remoting.Server
 Fable.Remoting.Giraffe
 Saturn
 jose-jwt
+FsConfig
+Dapper.FSharp

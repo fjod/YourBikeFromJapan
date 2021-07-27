@@ -63,7 +63,7 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
               Todos = model.Todos @ [ todo ] },
         Cmd.none
     | LoginOrRegister  ->
-       let result = Cmd.OfAsync.perform todosApi.loginOrRegister model.LoginData LogInResult
+       let result = Cmd.OfFunc.perform todosApi.loginOrRegister model.LoginData LogInResult
        model,result
     | LogInResult data ->
         { model with

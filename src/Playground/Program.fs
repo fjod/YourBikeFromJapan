@@ -9,6 +9,7 @@ open System.Text.Json
 open System.Text.Json.Serialization
 open Dapper
 open MySql.Data.MySqlClient;
+open Server.Environment;
 
 [<CLIMutable>]
 type Id = {
@@ -74,8 +75,6 @@ let GetConnection()  =
 [<EntryPoint>]
 let main argv =
     let () = printfn "hello"
-
-
 
     let request = "https://projapan.ru/bikes?mileage_min=0&mileage_max=100&year_min=2009&year_max=2021&rank_min=0&rank_max=5&auction%5B%5D=auc&auction%5B%5D=bds&auction%5B%5D=jba&auction%5B%5D=arai&date=all&volume=750&manufacturer=H&model="
     let client = new HttpClient()

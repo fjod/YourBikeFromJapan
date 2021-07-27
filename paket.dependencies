@@ -4,6 +4,7 @@ storage: none
 
 nuget Dapper.FSharp
 nuget Fable.Remoting.Giraffe
+nuget FsConfig
 nuget jose-jwt 3.2.0
 nuget MySql.Data
 nuget Saturn

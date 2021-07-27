@@ -1,10 +1,13 @@
-module Server
+module Server.Server
+
 
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
+
 open Saturn
 
 open Shared
+open Server.Types
 
 
 
@@ -31,6 +34,9 @@ storage.AddTodo(Todo.create "Write your app")
 storage.AddTodo(Todo.create "Ship it !!!")
 |> ignore
 
+//https://github.com/demystifyfp/FsConfig  look for env vars
+
+
 let todosApi =
     { getTodos = fun () -> async { return storage.GetTodos() }
       addTodo =
@@ -39,7 +45,10 @@ let todosApi =
                   match storage.AddTodo todo with
                   | Ok () -> return todo
                   | Error e -> return failwith e
-              } }
+              }
+      loginOrRegister = fun t -> login(t)
+
+    }
 
 let webApp =
     Remoting.createApi ()
@@ -47,13 +56,16 @@ let webApp =
     |> Remoting.fromValue todosApi
     |> Remoting.buildHttpHandler
 
+
 let app =
     application {
+
         url "http://0.0.0.0:8085"
         use_router webApp
         memory_cache
         use_static "public"
         use_gzip
     }
+
 
 run app
