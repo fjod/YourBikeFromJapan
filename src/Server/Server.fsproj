@@ -7,9 +7,9 @@
   <ItemGroup>
     <None Include="paket.references" />
     <Compile Include="Environment.fs" />
+    <Compile Include="Security.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Types.fs" />
-    <Compile Include="Security.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>
   <ItemGroup>

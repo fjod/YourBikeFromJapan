@@ -3,13 +3,14 @@ module Index
 open Elmish
 open Fable.Remoting.Client
 open Shared
+open Client.Cookies
 
 type Model = {
     Todos: Todo list
     Input: string
     LoginState : string
-    LoginData : LoginInfo
-    Token : string
+    InputData : LoginInfo
+    Token : string option
 }
 
 type Msg =
@@ -30,12 +31,17 @@ let todosApi =
     |> Remoting.buildProxy<ITodosApi>
 
 let init () : Model * Cmd<Msg> =
-    let model = { Todos = []; Input = ""; LoginState = "not logged in"; LoginData = {Email = ""; Password = ""}; Token = "" }
+    let currentToken = findTokenValue()
+    match currentToken with
+    | Ok t ->
+        let model = { Todos = []; Input = ""; LoginState = "Logged in"; InputData = {Email = ""; Password = ""}; Token = Some t }
+        model, Cmd.Empty //cmd should be changed to get relevant bikes
+    | Error _ ->
+        let model = { Todos = []; Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None }
+        model, Cmd.Empty
 
-    let cmd =
-        Cmd.OfAsync.perform todosApi.getTodos () GotTodos
 
-    model, cmd
+
 
 let getVal s =
     match s with
@@ -47,11 +53,11 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     | GotTodos todos -> { model with Todos = todos }, Cmd.none
     | SetInput value -> { model with Input = value }, Cmd.none
     | SetEmail v ->
-        let newData = {model.LoginData with Email = v}
-        {model with LoginData = newData},Cmd.none
+        let newData = {model.InputData with Email = v}
+        {model with InputData = newData},Cmd.none
     | SetPassword v ->
-        let newData = {model.LoginData with Password = v}
-        {model with LoginData = newData},Cmd.none
+        let newData = {model.InputData with Password = v}
+        {model with InputData = newData},Cmd.none
 
     | AddTodo ->
         let todo = Todo.create model.Input
@@ -65,21 +71,22 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
               Todos = model.Todos @ [ todo ] },
         Cmd.none
     | Login  ->
-       let result = Cmd.OfFunc.perform todosApi.login model.LoginData LogInResult
+       let result = Cmd.OfFunc.perform todosApi.login model.InputData LogInResult
        model,result
     | LogInResult data ->
         { model with
            LoginState = getVal data.Message
-           Token = data.Token            },
+           Token = Some data.Token            },
         Cmd.none
 
     | Register  ->
-       let result = Cmd.OfFunc.perform todosApi.login model.LoginData LogInResult
+       let result = Cmd.OfFunc.perform todosApi.login model.InputData LogInResult
        model,result
     | RegisterResult data ->
+        setTokenValue data.Token
         { model with
            LoginState = getVal data.Message
-           Token = data.Token            },
+           Token = Some data.Token            },
         Cmd.none
 
 
