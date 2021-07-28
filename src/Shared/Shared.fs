@@ -6,7 +6,11 @@ type Todo = { Id: Guid; Description: string }
 
 type LoginInfo = {Email:string; Password:string}
 
-type LoginResult ={Result:bool; Message:string option; Token:string}
+type LoginResult ={
+    Result:bool
+    Message:string option
+    Token:string option
+}
 
 module Todo =
     let isValid (description: string) =
@@ -25,6 +29,7 @@ type ITodosApi =
       addTodo: Todo -> Async<Todo>
       login: LoginInfo -> LoginResult
       register: LoginInfo -> LoginResult
+      validateToken: string -> bool
     }
 
 type SecureRequest<'t> = {
@@ -42,4 +47,8 @@ type DbUser = {
     email : string
     password : string
     salt : string
+}
+
+type AppUser = {
+    email:string
 }

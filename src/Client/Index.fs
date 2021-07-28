@@ -24,6 +24,7 @@ type Msg =
     | RegisterResult of LoginResult
     | SetEmail of string
     | SetPassword of string
+    | ValidateToken of bool
 
 let todosApi =
     Remoting.createApi ()
@@ -32,13 +33,15 @@ let todosApi =
 
 let init () : Model * Cmd<Msg> =
     let currentToken = findTokenValue()
+
     match currentToken with
     | Ok t ->
-        let model = { Todos = []; Input = ""; LoginState = "Logged in"; InputData = {Email = ""; Password = ""}; Token = Some t }
-        model, Cmd.Empty //cmd should be changed to get relevant bikes
+        let ret = Cmd.OfFunc.perform todosApi.validateToken t ValidateToken
+        let model = { Todos = []; Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t }
+        model, ret //cmd should be changed to get relevant bikes
     | Error _ ->
         let model = { Todos = []; Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None }
-        model, Cmd.Empty
+        model, Cmd.none
 
 
 
@@ -76,19 +79,24 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     | LogInResult data ->
         { model with
            LoginState = getVal data.Message
-           Token = Some data.Token            },
+           Token = data.Token            },
         Cmd.none
 
     | Register  ->
-       let result = Cmd.OfFunc.perform todosApi.login model.InputData LogInResult
+       let result = Cmd.OfFunc.perform todosApi.register model.InputData RegisterResult
        model,result
     | RegisterResult data ->
-        setTokenValue data.Token
+        setTokenValue data.Token.Value
         { model with
            LoginState = getVal data.Message
-           Token = Some data.Token            },
+           Token =  data.Token            },
         Cmd.none
-
+    | ValidateToken tokenIsFine ->
+        match tokenIsFine with
+        | true ->
+            let model = { model with LoginState = "Logged in" }
+            model, Cmd.none //cmd should be changed to get relevant bikes
+        | _ -> model, Cmd.none
 
 
 open Feliz

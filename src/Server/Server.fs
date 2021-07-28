@@ -48,6 +48,7 @@ let todosApi =
               }
       login = login
       register = register
+      validateToken = validate
     }
 
 let webApp =
