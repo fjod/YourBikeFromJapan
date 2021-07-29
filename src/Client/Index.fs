@@ -4,6 +4,9 @@ open Elmish
 open Fable.Remoting.Client
 open Shared
 open Client.Cookies
+open System
+
+
 
 type Model = {
     Todos: Todo list
@@ -25,6 +28,11 @@ type Msg =
     | SetEmail of string
     | SetPassword of string
     | ValidateToken of bool
+let isEmailAndPasswordValid (data: LoginInfo)=
+
+       let em = String.IsNullOrWhiteSpace data.Email |> not //TODO: proper validation
+       let p = String.IsNullOrWhiteSpace data.Password |> not
+       em && p
 
 let todosApi =
     Remoting.createApi ()
@@ -36,9 +44,9 @@ let init () : Model * Cmd<Msg> =
 
     match currentToken with
     | Ok t ->
-        let ret = Cmd.OfFunc.perform todosApi.validateToken t ValidateToken
+        let ret = Cmd.OfAsync.perform todosApi.validateToken t ValidateToken
         let model = { Todos = []; Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t }
-        model, ret //cmd should be changed to get relevant bikes
+        model, ret //TODO: cmd should be changed to get relevant bikes
     | Error _ ->
         let model = { Todos = []; Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None }
         model, Cmd.none
@@ -74,7 +82,7 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
               Todos = model.Todos @ [ todo ] },
         Cmd.none
     | Login  ->
-       let result = Cmd.OfFunc.perform todosApi.login model.InputData LogInResult
+       let result = Cmd.OfAsync.perform todosApi.login model.InputData LogInResult
        model,result
     | LogInResult data ->
         { model with
@@ -83,7 +91,7 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         Cmd.none
 
     | Register  ->
-       let result = Cmd.OfFunc.perform todosApi.register model.InputData RegisterResult
+       let result = Cmd.OfAsync.perform todosApi.register model.InputData RegisterResult
        model,result
     | RegisterResult data ->
         setTokenValue data.Token.Value
@@ -125,7 +133,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
             ]
         ]
         Bulma.field.div [
-            field.isGrouped
+            field.isGroupedCentered
             prop.children [
 
                 Bulma.control.p [
@@ -152,7 +160,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                     control.isExpanded
                     prop.children [
                         Bulma.input.text [
-                            prop.value model.Input
+                            prop.value model.InputData.Email
                             prop.placeholder "Email"
                             prop.onChange (fun x -> SetEmail x |> dispatch)
                         ]
@@ -163,7 +171,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                     control.isExpanded
                     prop.children [
                         Bulma.input.text [
-                            prop.value model.Input
+                            prop.value model.InputData.Password
                             prop.placeholder "Password"
                             prop.onChange (fun x -> SetPassword x |> dispatch)
                         ]
@@ -173,7 +181,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                 Bulma.control.p [
                     Bulma.button.a [
                         color.isPrimary
-                        prop.disabled (Todo.isValid model.Input |> not)
+                        prop.disabled (isEmailAndPasswordValid model.InputData |> not)
                         prop.onClick (fun _ -> dispatch Register)
                         prop.text "Register"
                     ]
@@ -182,7 +190,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                 Bulma.control.p [
                     Bulma.button.a [
                         color.isPrimary
-                        prop.disabled (Todo.isValid model.Input |> not)
+                        prop.disabled (isEmailAndPasswordValid model.InputData |> not)
                         prop.onClick (fun _ -> dispatch Login)
                         prop.text "Login"
                     ]

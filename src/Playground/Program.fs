@@ -9,7 +9,8 @@ open System.Text.Json
 open System.Text.Json.Serialization
 open Dapper
 open MySql.Data.MySqlClient;
-open Server.Environment;
+open Server.Environment
+open Shared;
 
 [<CLIMutable>]
 type Id = {
@@ -83,6 +84,11 @@ let main argv =
         ()
 
     async {
+
+        use conn = new MySqlConnection("Server=localhost;Port=3306;Database=Bikes;Uid=root;Pwd=312312;")
+        conn.Open ()
+        let! result = conn.QueryFirstOrDefaultAsync<DbUser>($"select * from User where email = '1' limit 1") |> Async.AwaitTask
+        printfn "Hello world %s" result.email
         let message = new HttpRequestMessage(HttpMethod.Get, request)
         message.Headers.Add ( "Host", "projapan.ru" )
         message.Headers.Add ( HttpRequestHeader.ContentType.ToString(), "application/json; charset=utf-8" )

@@ -7,7 +7,6 @@ type Todo = { Id: Guid; Description: string }
 type LoginInfo = {Email:string; Password:string}
 
 type LoginResult ={
-    Result:bool
     Message:string option
     Token:string option
 }
@@ -20,6 +19,7 @@ module Todo =
         { Id = Guid.NewGuid()
           Description = description }
 
+
 module Route =
     let builder typeName methodName =
         sprintf "/api/%s/%s" typeName methodName
@@ -27,9 +27,9 @@ module Route =
 type ITodosApi =
     { getTodos: unit -> Async<Todo list>
       addTodo: Todo -> Async<Todo>
-      login: LoginInfo -> LoginResult
-      register: LoginInfo -> LoginResult
-      validateToken: string -> bool
+      login: LoginInfo -> Async<LoginResult>
+      register: LoginInfo -> Async<LoginResult>
+      validateToken: string -> Async<bool>
     }
 
 type SecureRequest<'t> = {

@@ -8,12 +8,12 @@ open Server.Security
 
 open Shared.NullHelper
 
+//docker run --name JapanBike2 -v c:/tmp/mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=312312 -d mysql:latest
 let getUserByEmail(email:string) =
    async {
        let z = getSettings
        use connection = new MySqlConnection(z.connectionString)
        let! result = connection.QueryFirstOrDefaultAsync<DbUser>($"select * from User where email = '{email}' limit 1") |> Async.AwaitTask
-
        return convert result
    } |> Async.RunSynchronously
 

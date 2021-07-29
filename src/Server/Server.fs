@@ -46,9 +46,9 @@ let todosApi =
                   | Ok () -> return todo
                   | Error e -> return failwith e
               }
-      login = login
-      register = register
-      validateToken = validate
+      login = fun data -> async { return login(data) }
+      register = fun data -> async { return register(data) }
+      validateToken = fun data -> async { return validate(data) }
     }
 
 let webApp =

@@ -40,6 +40,9 @@ type Config = {
     env : string option
 }
 
+type ConfigFromFile = {
+    connectionString: string
+}
 let getSettings =
             let ofString = function
                 | ""
@@ -53,5 +56,8 @@ let getSettings =
                     .Build()
             let currentEnv = configurationRoot.GetValue("ASPNETCORE_ENVIRONMENT")
             let appConfig = new FsConfig.AppConfig(configurationRoot)
-            let result =  appConfig.Get<string>("connectionString")
-            { connectionString = result.OkValue; env = ofString currentEnv}
+            let result =  appConfig.Get<ConfigFromFile>()
+            match result with
+            | Ok z ->
+               { connectionString = z.connectionString; env = ofString currentEnv}
+            | _ -> failwith "no connection string"
