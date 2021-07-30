@@ -1,5 +1,6 @@
 module Index
 
+
 open Elmish
 open Fable.Remoting.Client
 open Shared
@@ -16,6 +17,18 @@ type Model = {
     Token : string option
 }
 
+
+let isEmailAndPasswordValid (data: LoginInfo)=
+
+       let em = String.IsNullOrWhiteSpace data.Email |> not //TODO: proper validation
+       let p = String.IsNullOrWhiteSpace data.Password |> not
+       em && p
+
+let todosApi =
+    Remoting.createApi ()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.buildProxy<ITodosApi>
+
 type Msg =
     | GotTodos of Todo list
     | SetInput of string
@@ -28,18 +41,14 @@ type Msg =
     | SetEmail of string
     | SetPassword of string
     | ValidateToken of bool
-let isEmailAndPasswordValid (data: LoginInfo)=
 
-       let em = String.IsNullOrWhiteSpace data.Email |> not //TODO: proper validation
-       let p = String.IsNullOrWhiteSpace data.Password |> not
-       em && p
+type Msg2 =
+    | LoginMsg of Client.MessageTypes.LoginState
+    | RegisterMsg of Client.MessageTypes.RegisterState
+    | TodoState of Client.MessageTypes.TodoState
+    | ViewUpdateMsg of Client.MessageTypes.ViewUpdateState
 
-let todosApi =
-    Remoting.createApi ()
-    |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.buildProxy<ITodosApi>
-
-let init () : Model * Cmd<Msg> =
+let init () : Model * Cmd<Msg2> =
     let currentToken = findTokenValue()
 
     match currentToken with
@@ -52,12 +61,20 @@ let init () : Model * Cmd<Msg> =
         model, Cmd.none
 
 
-
+let workWIthLogin model msg =
+     model , Cmd.none
 
 let getVal s =
     match s with
     | Some value -> value
     | _ -> "error"
+
+let update2 (msg: Msg2) (model: Model) : Model * Cmd<Msg2> =
+     match msg with
+     | LoginMsg n -> workWIthLogin model n
+     | RegisterMsg n -> workWIthLogin model n
+     | TodoState n -> workWIthLogin model n
+     | ViewUpdateMsg n ->  workWIthLogin model n
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
@@ -135,7 +152,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
         Bulma.field.div [
             field.isGroupedCentered
             prop.children [
-                 
+
                 Bulma.label [
                         prop.text ("You are: " + model.LoginState)
                     ]
