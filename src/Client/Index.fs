@@ -135,7 +135,10 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
         Bulma.field.div [
             field.isGroupedCentered
             prop.children [
-
+                 
+                Bulma.label [
+                        prop.text ("You are: " + model.LoginState)
+                    ]
                 Bulma.control.p [
                     control.isExpanded
                     prop.children [

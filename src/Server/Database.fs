@@ -25,10 +25,15 @@ let createUser(email:string) (inputPassword:string)=
     let passForDb = base64 passwordHash
     let saltForDb = base64 salt
     async {
-           let z = getSettings
-           use connection = new MySqlConnection(z.connectionString)
-           let! result = connection.QueryFirstOrDefaultAsync<DbUser>($"insert into User (email, password, salt) values ('{email}','{passForDb}',{saltForDb});")
-                         |> Async.AwaitTask
+           try
 
-           return convert result
+               let z = getSettings
+               use connection = new MySqlConnection(z.connectionString)
+               let! _ = connection.QueryFirstOrDefaultAsync<DbUser>($"insert into User (email, password, salt) values ('{email}','{passForDb}','{saltForDb}');")
+                             |> Async.AwaitTask
+               return Ok ""
+            with
+             | :? Exception as e  ->
+                                     printfn "%s" e.Message
+                                     return Error e.Message
        } |> Async.RunSynchronously
