@@ -1,22 +1,15 @@
 module Index
 
 
+open Client
 open Elmish
 open Fable.Remoting.Client
 open Shared
 open Client.Cookies
 open System
-
-
-
-type Model = {
-    Todos: Todo list
-    Input: string
-    LoginState : string
-    InputData : LoginInfo
-    Token : string option
-}
-
+open ClientModel
+open ClientMsg
+open Login
 
 let isEmailAndPasswordValid (data: LoginInfo)=
 
@@ -30,10 +23,7 @@ let todosApi =
     |> Remoting.buildProxy<ITodosApi>
 
 type Msg =
-    | GotTodos of Todo list
     | SetInput of string
-    | AddTodo
-    | AddedTodo of Todo
     | Login
     | LogInResult of LoginResult
     | Register
@@ -42,11 +32,7 @@ type Msg =
     | SetPassword of string
     | ValidateToken of bool
 
-type Msg2 =
-    | LoginMsg of Client.MessageTypes.LoginState
-    | RegisterMsg of Client.MessageTypes.RegisterState
-    | TodoState of Client.MessageTypes.TodoState
-    | ViewUpdateMsg of Client.MessageTypes.ViewUpdateState
+
 
 let init () : Model * Cmd<Msg2> =
     let currentToken = findTokenValue()
@@ -54,31 +40,24 @@ let init () : Model * Cmd<Msg2> =
     match currentToken with
     | Ok t ->
         let ret = Cmd.OfAsync.perform todosApi.validateToken t ValidateToken
-        let model = { Todos = []; Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t }
-        model, ret //TODO: cmd should be changed to get relevant bikes
+        let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t }
+        model, Cmd.none //TODO: cmd should be changed to get relevant bikes
     | Error _ ->
-        let model = { Todos = []; Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None }
+        let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None }
         model, Cmd.none
 
 
-let workWIthLogin model msg =
-     model , Cmd.none
-
-let getVal s =
-    match s with
-    | Some value -> value
-    | _ -> "error"
 
 let update2 (msg: Msg2) (model: Model) : Model * Cmd<Msg2> =
      match msg with
-     | LoginMsg n -> workWIthLogin model n
-     | RegisterMsg n -> workWIthLogin model n
-     | TodoState n -> workWIthLogin model n
-     | ViewUpdateMsg n ->  workWIthLogin model n
+     | LoginMsg n ->
+         let loginModel, loginCmd = workWithLogin model n todosApi
+         model , Cmd.map LoginMsg loginCmd
+     | RegisterMsg n -> workWithLogin model n
+     | ViewUpdateMsg n ->  workWithLogin model n
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
-    | GotTodos todos -> { model with Todos = todos }, Cmd.none
     | SetInput value -> { model with Input = value }, Cmd.none
     | SetEmail v ->
         let newData = {model.InputData with Email = v}
@@ -86,18 +65,6 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     | SetPassword v ->
         let newData = {model.InputData with Password = v}
         {model with InputData = newData},Cmd.none
-
-    | AddTodo ->
-        let todo = Todo.create model.Input
-
-        let cmd =
-            Cmd.OfAsync.perform todosApi.addTodo todo AddedTodo
-
-        { model with Input = "" }, cmd
-    | AddedTodo todo ->
-        { model with
-              Todos = model.Todos @ [ todo ] },
-        Cmd.none
     | Login  ->
        let result = Cmd.OfAsync.perform todosApi.login model.InputData LogInResult
        model,result

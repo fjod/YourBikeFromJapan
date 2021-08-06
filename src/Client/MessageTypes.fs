@@ -11,11 +11,6 @@ type RegisterState =
      | RegisterResult of LoginResult
      | ValidateToken of bool
 
-type TodoState =
-    | GotTodos of Todo list
-    | AddTodo
-    | AddedTodo of Todo
-
 type ViewUpdateState =
      | SetEmail of string
      | SetPassword of string

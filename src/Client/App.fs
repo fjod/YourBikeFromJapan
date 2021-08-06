@@ -8,7 +8,7 @@ open Elmish.Debug
 open Elmish.HMR
 #endif
 
-Program.mkProgram Index.init Index.update Index.view
+Program.mkProgram Index.init Index.update2 Index.view
 #if DEBUG
 |> Program.withConsoleTrace
 #endif
