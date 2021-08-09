@@ -25,17 +25,6 @@ let todosApi =
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.buildProxy<ITodosApi>
 
-type Msg =
-    | SetInput of string
-    | Login
-    | LogInResult of LoginResult
-    | Register
-    | RegisterResult of LoginResult
-    | SetEmail of string
-    | SetPassword of string
-    | ValidateToken of bool
-
-
 
 let init () : Model * Cmd<Msg2> =
     let currentToken = findTokenValue()
@@ -82,7 +71,7 @@ let navBrand =
         ]
     ]
 
-let containerBox (model: Model) (dispatch: Msg -> unit) =
+let containerBox (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.box [
         Bulma.field.div [
             field.isGroupedCentered
@@ -98,7 +87,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                         Bulma.input.text [
                             prop.value model.InputData.Email
                             prop.placeholder "Email"
-                            prop.onChange (fun x -> SetEmail x |> dispatch)
+                            prop.onChange (fun x -> SetEmail x |> ViewUpdateMsg |> dispatch)
                         ]
                     ]
                 ]
@@ -109,7 +98,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                         Bulma.input.text [
                             prop.value model.InputData.Password
                             prop.placeholder "Password"
-                            prop.onChange (fun x -> SetPassword x |> dispatch)
+                            prop.onChange (fun x -> SetPassword x |> ViewUpdateMsg  |> dispatch)
                         ]
                     ]
                 ]
@@ -118,7 +107,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                     Bulma.button.a [
                         color.isPrimary
                         prop.disabled (isEmailAndPasswordValid model.InputData |> not)
-                        prop.onClick (fun _ -> dispatch Register)
+                        prop.onClick (fun _ ->  Register |> RegisterMsg |> dispatch)
                         prop.text "Register"
                     ]
                 ]
@@ -127,7 +116,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
                     Bulma.button.a [
                         color.isPrimary
                         prop.disabled (isEmailAndPasswordValid model.InputData |> not)
-                        prop.onClick (fun _ -> dispatch Login)
+                        prop.onClick (fun _ ->  Login |> LoginMsg |> dispatch)
                         prop.text "Login"
                     ]
                 ]
@@ -135,7 +124,7 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
         ]
     ]
 
-let view (model: Model) (dispatch: Msg -> unit) =
+let view (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.hero [
         hero.isFullHeight
         color.isPrimary
