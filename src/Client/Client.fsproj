@@ -12,6 +12,8 @@
         <Compile Include="ClientMsg.fs" />
         <Compile Include="Cookies.fs" />
         <Compile Include="Login.fs" />
+        <Compile Include="Register.fs" />
+        <Compile Include="LoginPageUI.fs" />
         <Compile Include="Index.fs" />
         <Compile Include="App.fs" />
     </ItemGroup>
