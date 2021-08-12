@@ -1,4 +1,4 @@
-﻿module Server.Types
+﻿module Server.WelcomeScreen
 
 
 open Shared

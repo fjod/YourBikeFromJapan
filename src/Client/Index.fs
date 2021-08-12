@@ -12,13 +12,8 @@ open ClientModel
 open ClientMsg
 open Login
 open Register
-open LoginPageUI
-
-let isEmailAndPasswordValid (data: LoginInfo)=
-
-       let em = String.IsNullOrWhiteSpace data.Email |> not //TODO: proper validation
-       let p = String.IsNullOrWhiteSpace data.Password |> not
-       em && p
+open LoginPageFuncs
+open Client.WelcomeScreen.WelcomeUI
 
 let todosApi =
     Remoting.createApi ()
@@ -30,13 +25,11 @@ let init () : Model * Cmd<Msg2> =
     let currentToken = findTokenValue()
     match currentToken with
     | Ok t ->
-        let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t }
-        let q = RegisterState.TryValidateToken t
-        let cmd = Cmd.ofMsg q
-        let cmd2 = Cmd.map RegisterMsg cmd
-        model, cmd2 //TODO: cmd should be changed to get relevant bikes
+        let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t; State = WelcomeScreen }
+        let q = RegisterState.TryValidateToken t |> Cmd.ofMsg |> Cmd.map RegisterMsg
+        model, q
     | Error _ ->
-        let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None }
+        let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None; State = WelcomeScreen }
         model, Cmd.none
 
 
@@ -71,58 +64,7 @@ let navBrand =
         ]
     ]
 
-let containerBox (model: Model) (dispatch: Msg2 -> unit) =
-    Bulma.box [
-        Bulma.field.div [
-            field.isGroupedCentered
-            prop.children [
 
-                Bulma.label [
-                        prop.text ("You are: " + model.LoginState)
-                    ]
-
-                Bulma.control.p [
-                    control.isExpanded
-                    prop.children [
-                        Bulma.input.text [
-                            prop.value model.InputData.Email
-                            prop.placeholder "Email"
-                            prop.onChange (fun x -> SetEmail x |> ViewUpdateMsg |> dispatch)
-                        ]
-                    ]
-                ]
-
-                Bulma.control.p [
-                    control.isExpanded
-                    prop.children [
-                        Bulma.input.text [
-                            prop.value model.InputData.Password
-                            prop.placeholder "Password"
-                            prop.onChange (fun x -> SetPassword x |> ViewUpdateMsg  |> dispatch)
-                        ]
-                    ]
-                ]
-
-                Bulma.control.p [
-                    Bulma.button.a [
-                        color.isPrimary
-                        prop.disabled (isEmailAndPasswordValid model.InputData |> not)
-                        prop.onClick (fun _ ->  Register |> RegisterMsg |> dispatch)
-                        prop.text "Register"
-                    ]
-                ]
-
-                Bulma.control.p [
-                    Bulma.button.a [
-                        color.isPrimary
-                        prop.disabled (isEmailAndPasswordValid model.InputData |> not)
-                        prop.onClick (fun _ ->  Login |> LoginMsg |> dispatch)
-                        prop.text "Login"
-                    ]
-                ]
-            ]
-        ]
-    ]
 
 let view (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.hero [
@@ -149,7 +91,7 @@ let view (model: Model) (dispatch: Msg2 -> unit) =
                                 text.hasTextCentered
                                 prop.text "YourBikeFromJapan"
                             ]
-                            containerBox model dispatch
+                            containerWelcome model dispatch
                         ]
                     ]
                 ]

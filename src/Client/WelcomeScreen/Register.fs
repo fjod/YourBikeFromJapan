@@ -19,8 +19,8 @@ let workWithRegister (model: Model) (msg: RegisterState) (todosApi: ITodosApi) :
     | ValidateToken tokenIsFine ->
         match tokenIsFine with
         | true ->
-            let model = { model with LoginState = "Logged in" }
-            model, Cmd.none //cmd should be changed to get relevant bikes
+            let model = { model with LoginState = "Logged in"; State = BikesScreen }
+            model, Cmd.none //TODO: cmd should be changed to get relevant bikes!
         | _ -> model, Cmd.none
     | TryValidateToken token ->
           let ret = Cmd.OfAsync.perform todosApi.validateToken token RegisterState.ValidateToken

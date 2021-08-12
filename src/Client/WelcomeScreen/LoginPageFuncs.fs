@@ -1,4 +1,4 @@
-﻿module Client.LoginPageUI
+﻿module Client.LoginPageFuncs
 
 open Client.MessageTypes
 open Elmish
