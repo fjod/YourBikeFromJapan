@@ -2,7 +2,20 @@ namespace Shared
 
 open System
 
-type Todo = { Id: Guid; Description: string }
+type Manufacturer =
+    | Honda
+    | Suzuki
+    | Kawasaki
+    | Yamaha
+    | BMW
+    | Ducati
+
+
+type Bike = {
+    Manufacturer : Manufacturer
+    Model : string
+    Year : int
+}
 
 type LoginInfo = {Email:string; Password:string}
 
@@ -10,14 +23,6 @@ type LoginResult ={
     Message:string option
     Token:string option
 }
-
-module Todo =
-    let isValid (description: string) =
-        String.IsNullOrWhiteSpace description |> not
-
-    let create (description: string) =
-        { Id = Guid.NewGuid()
-          Description = description }
 
 
 module Route =

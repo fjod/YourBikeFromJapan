@@ -5,23 +5,23 @@
         <DefineConstants>FABLE_COMPILER</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="MessageTypes.fs" />
+        <Compile Include="ClientModel.fs" />
+        <Compile Include="ClientMsg.fs" />
+        <Compile Include="Cookies.fs" />
         <Compile Include="BikesScreen\RequestedBikesUI.fs" />
         <Compile Include="BikesScreen\AddBikeUI.fs" />
         <Compile Include="BikesScreen\BikesHistoryUI.fs" />
         <Compile Include="BikesScreen\AuctDataUI.fs" />
         <Compile Include="BikesScreen\BikesUI.fs" />
-        <Compile Include="Index.fs" />
-        <Compile Include="App.fs" />
-        <None Include="index.html" />
-        <None Include="paket.references" />
-        <Compile Include="MessageTypes.fs" />
-        <Compile Include="ClientModel.fs" />
-        <Compile Include="ClientMsg.fs" />
-        <Compile Include="Cookies.fs" />
         <Compile Include="WelcomeScreen\Login.fs" />
         <Compile Include="WelcomeScreen\Register.fs" />
         <Compile Include="WelcomeScreen\LoginPageFuncs.fs" />
         <Compile Include="WelcomeScreen\WelcomeUI.fs" />
+        <Compile Include="Index.fs" />
+        <Compile Include="App.fs" />
+        <None Include="index.html" />
+        <None Include="paket.references" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Shared\Shared.fsproj" />

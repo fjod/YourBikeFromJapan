@@ -25,11 +25,13 @@ let init () : Model * Cmd<Msg2> =
     let currentToken = findTokenValue()
     match currentToken with
     | Ok t ->
-        let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}; Token = Some t; State = WelcomeScreen }
+        let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}
+                      Token = Some t; State = WelcomeScreen; UserRequestedBikes = Array.Empty() }
         let q = RegisterState.TryValidateToken t |> Cmd.ofMsg |> Cmd.map RegisterMsg
         model, q
     | Error _ ->
-        let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}; Token = None; State = WelcomeScreen }
+        let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}
+                      Token = None; State = WelcomeScreen;UserRequestedBikes = Array.Empty() }
         model, Cmd.none
 
 

@@ -6,7 +6,10 @@ type UIState =
     | WelcomeScreen
     | BikesScreen
 
+
+
 type Model = {
+    UserRequestedBikes : Bike[]
     Input: string
     LoginState : string
     InputData : LoginInfo
