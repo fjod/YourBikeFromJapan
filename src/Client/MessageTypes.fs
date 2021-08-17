@@ -15,3 +15,8 @@ type RegisterState =
 type ViewUpdateState =
      | SetEmail of string
      | SetPassword of string
+
+type BikeScreenState =
+    | SelectedManufacturerName of string
+    | SetStartYear of string
+    | SetEndYear of string

@@ -14,6 +14,7 @@
         <Compile Include="BikesScreen\BikesHistoryUI.fs" />
         <Compile Include="BikesScreen\AuctDataUI.fs" />
         <Compile Include="BikesScreen\BikesUI.fs" />
+        <Compile Include="BikesScreen\BikeScreenFuncs.fs" />
         <Compile Include="WelcomeScreen\Login.fs" />
         <Compile Include="WelcomeScreen\Register.fs" />
         <Compile Include="WelcomeScreen\LoginPageFuncs.fs" />

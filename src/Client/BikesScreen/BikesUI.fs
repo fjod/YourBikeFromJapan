@@ -15,8 +15,8 @@ let containerBikes (model: Model) (dispatch: Msg2 -> unit) =
             Bulma.column [
                 column.is2
                 prop.children [
-                    containerWithRequestedBikes(model)
-                    containerAddBike(model)
+                    containerWithRequestedBikes model dispatch
+                    containerAddBike model dispatch
                 ]
             ] //1st column
             Bulma.column[
