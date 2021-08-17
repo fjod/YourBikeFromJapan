@@ -15,6 +15,8 @@ type Model = {
     InputData : LoginInfo
     Token : string option
     State : UIState
+
     StartYear: string option
     EndYear : string option
+    SelectedManufacturer : string option
 }

@@ -27,12 +27,12 @@ let init () : Model * Cmd<Msg2> =
     match currentToken with
     | Ok t ->
         let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}
-                      Token = Some t; State = WelcomeScreen; UserRequestedBikes = Array.Empty(); StartYear = None; EndYear = None }
+                      Token = Some t; State = WelcomeScreen; UserRequestedBikes = Array.Empty(); StartYear = None; EndYear = None; SelectedManufacturer = None }
         let q = RegisterState.TryValidateToken t |> Cmd.ofMsg |> Cmd.map RegisterMsg
         model, q
     | Error _ ->
         let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}
-                      Token = None; State = WelcomeScreen;UserRequestedBikes = Array.Empty(); StartYear = None; EndYear = None }
+                      Token = None; State = WelcomeScreen;UserRequestedBikes = Array.Empty(); StartYear = None; EndYear = None; SelectedManufacturer = None }
         model, Cmd.none
 
 

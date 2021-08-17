@@ -7,4 +7,7 @@ open Elmish
 open Shared
 
 let workBikeScreenUi (model: Model) (msg: BikeScreenState) : Model * Cmd<BikeScreenState> =
-   model, Cmd.none
+   match msg with
+   | SetStartYear v -> {model with StartYear = Some v} , Cmd.none
+   | SetEndYear v -> {model with EndYear = Some v} , Cmd.none
+   | SelectedManufacturerName v -> {model with SelectedManufacturer = Some v} , Cmd.none
