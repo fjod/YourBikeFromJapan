@@ -27,7 +27,7 @@ let createManufacturerDropdown (dispatch: Msg2 -> unit) =
         Dropdown.menu [  ] [
             Dropdown.content [] [
                 for m in cases ->
-                 Dropdown.Item.a [  Dropdown.Item.Props[  OnClick (fun _ -> SelectedManufacturerName m.Name |> BikeScreenMsg |> dispatch)  ] ]
+                 Dropdown.Item.a [  Dropdown.Item.Props[  OnClick (fun _ -> SelectedManufacturerName m.Name |> BikeScreenMsg |> dispatch)  ] ] //SelectedManufacturerName no intellisense if remove open dir
                      [
                      str m.Name
                  ]
@@ -59,10 +59,42 @@ let createEndYear (model: Model) (dispatch: Msg2 -> unit) =
                     ]
                 ]
 
+let GetMaker (model:Model) =
+    let maker = BikeRangeHelper.BikeRangeFromString model.SelectedManufacturer
+    match maker with
+    |None -> None
+    |Some m ->
+          Some {Maker = m;Model = ""; StartYear = ""; EndYear = ""}
+let GetStartYear (model:Model) (range: BikeRange option) =
+    match (model.StartYear, range) with
+    |Some m, Some r ->
+          Some {r with StartYear = m}
+    | _ -> None
+let GetEndYear (model:Model) (range: BikeRange option) =
+    match (model.EndYear, range) with
+    |Some m, Some r ->
+          Some {r with EndYear = m}
+    | _ -> None
+
+let GetBikeRange (model:Model) =
+   GetMaker model |> GetStartYear model |> GetEndYear model
+
+let AddBikeEvent (model: Model) (dispatch: Msg2 -> unit)=
+    match GetBikeRange(model) with
+    |Some range -> AddBike range |> BikeScreenMsg |> dispatch
+    |None -> ()
+
 let containerAddBike (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.container [ prop.children [
         createManufacturerDropdown(dispatch)
         createStartYear model dispatch
         createEndYear model dispatch
+        Bulma.control.p [
+                    Bulma.button.a [
+                        color.isPrimary
+                        prop.onClick (fun _ -> AddBikeEvent model dispatch)
+                        prop.text "Add Bike To Search List"
+                    ]
+                ]
     ]
                        ]

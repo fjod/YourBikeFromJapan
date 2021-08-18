@@ -20,3 +20,5 @@ type BikeScreenState =
     | SelectedManufacturerName of string
     | SetStartYear of string
     | SetEndYear of string
+    | AddBike of BikeRange
+    | BikeAdded of string

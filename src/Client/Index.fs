@@ -27,12 +27,12 @@ let init () : Model * Cmd<Msg2> =
     match currentToken with
     | Ok t ->
         let model = { Input = ""; LoginState = "Checking token"; InputData = {Email = ""; Password = ""}
-                      Token = Some t; State = WelcomeScreen; UserRequestedBikes = Array.Empty(); StartYear = None; EndYear = None; SelectedManufacturer = None }
+                      Token = Some t; State = WelcomeScreen; UserRequestedBikes = Array.Empty(); StartYear = Some "1990"; EndYear = Some "2020"; SelectedManufacturer = None }
         let q = RegisterState.TryValidateToken t |> Cmd.ofMsg |> Cmd.map RegisterMsg
         model, q
     | Error _ ->
         let model = { Input = ""; LoginState = "Not logged in"; InputData = {Email = ""; Password = ""}
-                      Token = None; State = WelcomeScreen;UserRequestedBikes = Array.Empty(); StartYear = None; EndYear = None; SelectedManufacturer = None }
+                      Token = None; State = WelcomeScreen;UserRequestedBikes = Array.Empty(); StartYear = Some "1990"; EndYear = Some "2020"; SelectedManufacturer = None }
         model, Cmd.none
 
 
@@ -49,7 +49,7 @@ let update2 (msg: Msg2) (model: Model) : Model * Cmd<Msg2> =
            let loginModel, loginCmd = workWithLoginUI model n
            loginModel , Cmd.map ViewUpdateMsg loginCmd
      | BikeScreenMsg n ->
-         let model, cmd = workBikeScreenUi model n
+         let model, cmd = workBikeScreenUi model n todosApi
          model, Cmd.map BikeScreenMsg cmd
 
 open Feliz

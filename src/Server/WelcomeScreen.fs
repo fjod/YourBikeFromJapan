@@ -35,6 +35,6 @@ let register  (data : LoginInfo) :LoginResult =
 
 let validate jwt =
      try
-        let _ = decodeJwt jwt
+        let _ = decodeJwt jwt //user is encoded it token
         true
      with _ -> false
