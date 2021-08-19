@@ -9,6 +9,7 @@
     <Compile Include="Environment.fs" />
     <Compile Include="Security.fs" />
     <Compile Include="Database.fs" />
+    <Compile Include="BikeScreen.fs" />
     <Compile Include="WelcomeScreen.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>

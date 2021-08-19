@@ -19,4 +19,15 @@ type Model = {
     StartYear: string option
     EndYear : string option
     SelectedManufacturer : string option
+    Models: string[]
 }
+
+let BikeRangeFromModel (m:Model) : BikeRange option =
+    match m.SelectedManufacturer, m.StartYear, m.EndYear with
+    | v, Some s, Some e ->
+          let maker = BikeRangeHelper.BikeRangeFromString v
+          match maker with
+          | Some m ->
+             Some {StartYear = s; EndYear = e; Model = ""; Maker = m}
+          | None -> None
+    | _ -> None
