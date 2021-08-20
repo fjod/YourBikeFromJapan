@@ -20,6 +20,7 @@ type Model = {
     EndYear : string option
     SelectedManufacturer : string option
     Models: string[]
+    SelectedModel: string option
 }
 
 let BikeRangeFromModel (m:Model) : BikeRange option =

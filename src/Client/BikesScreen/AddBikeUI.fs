@@ -35,6 +35,28 @@ let createManufacturerDropdown (dispatch: Msg2 -> unit) =
         ]
     ]
 
+let createModelsDropdown (model:Model) (dispatch: Msg2 -> unit) =
+    Dropdown.dropdown [ Dropdown.IsHoverable
+                         ] [
+        Dropdown.trigger [] [
+            Button.button [] [
+                span [] [ str "Select Model" ]
+                Icon.icon [ Icon.Size IsSmall ] [
+                    Fa.i [ Fa.Solid.AngleDown ] []
+                ]
+            ]
+        ]
+        Dropdown.menu [  ] [
+            Dropdown.content [] [
+                for m in model.Models ->
+                 Dropdown.Item.a [  Dropdown.Item.Props[  OnClick (fun _ -> SelectedModel m |> BikeScreenMsg |> dispatch)  ] ] //SelectedManufacturerName no intellisense if remove open dir
+                     [
+                     str m
+                 ]
+            ]
+        ]
+    ]
+
 let createStartYear (model: Model) (dispatch: Msg2 -> unit) =
       Bulma.control.p [
                     control.isExpanded
@@ -76,6 +98,7 @@ let GetEndYear (model:Model) (range: BikeRange option) =
           Some {r with EndYear = m}
     | _ -> None
 
+
 let GetBikeRange (model:Model) =
    GetMaker model |> GetStartYear model |> GetEndYear model
 
@@ -89,6 +112,7 @@ let containerAddBike (model: Model) (dispatch: Msg2 -> unit) =
         createManufacturerDropdown(dispatch)
         createStartYear model dispatch
         createEndYear model dispatch
+        createModelsDropdown model dispatch
         Bulma.control.p [
                     Bulma.button.a [
                         color.isPrimary

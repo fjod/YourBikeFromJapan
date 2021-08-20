@@ -3,9 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
+    <Compile Include="BikeAPI.fs" />
     <Compile Include="Environment.fs" />
     <Compile Include="Security.fs" />
     <Compile Include="Database.fs" />

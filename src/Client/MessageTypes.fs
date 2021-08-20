@@ -18,6 +18,7 @@ type ViewUpdateState =
 
 type BikeScreenState =
     | SelectedManufacturerName of string
+    | SelectedModel of string
     | SetStartYear of string
     | SetEndYear of string
     | ReturnedModels of string[]

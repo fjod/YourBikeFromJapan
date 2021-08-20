@@ -22,6 +22,7 @@ let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi)
    | SetStartYear v -> {model with StartYear = Some v}, requestBikeModelsIfPossible model todosApi
    | SetEndYear v -> {model with EndYear = Some v} , requestBikeModelsIfPossible model todosApi
    | SelectedManufacturerName v -> {model with SelectedManufacturer = Some v}, requestBikeModelsIfPossible model todosApi
+   | SelectedModel v -> {model with SelectedModel = Some v}, Cmd.none
    | AddBike r ->
        let result = Cmd.OfAsync.perform todosApi.addBike ("",r)  BikeScreenState.BikeAdded
        model, result
