@@ -8,9 +8,10 @@ open Elmish
 open Shared
 open Cookies
 
+let token = findTokenValue()
+
 let requestBikeModelsIfPossible(model: Model) (todosApi: ITodosApi) :  Cmd<BikeScreenState> =
     let range = BikeRangeFromModel model
-    let token = findTokenValue()
     match range, token with
     | Some r, Ok t ->
         Cmd.OfAsync.perform todosApi.getBikesFromRange (t,r)  BikeScreenState.ReturnedModels
@@ -24,9 +25,13 @@ let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi)
    | SelectedManufacturerName v -> {model with SelectedManufacturer = Some v}, requestBikeModelsIfPossible model todosApi
    | SelectedModel v -> {model with SelectedModel = Some v}, Cmd.none
    | AddBike r ->
-       let result = Cmd.OfAsync.perform todosApi.addBike ("",r)  BikeScreenState.BikeAdded
-       model, result
+       match token with
+       | Ok t ->
+            let result = Cmd.OfAsync.perform todosApi.addBike (t,r)  BikeScreenState.BikeAdded
+            model, result
+       | Error e ->  model, Cmd.none
    | BikeAdded bike->
-       model, Cmd.none //user added bike; display it somewhere ?
+       let test = Array.append model.UserRequestedBikes [|bike|]
+       {model with UserRequestedBikes = test}, Cmd.none //user added bike; display it somewhere ?
    | ReturnedModels models ->
        {model with Models = models}, Cmd.none

@@ -52,7 +52,7 @@ type ITodosApi =
     { login: LoginInfo -> Async<LoginResult>
       register: LoginInfo -> Async<LoginResult>
       validateToken: string -> Async<bool>
-      addBike: string*BikeRange ->Async<string> //return range of bikes and save it to model
+      addBike: string*BikeRange ->Async<BikeRange> //return range of bikes and save it to model
       getBikesFromRange:string*BikeRange->Async<string[]>
     }
 

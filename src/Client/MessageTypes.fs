@@ -23,4 +23,4 @@ type BikeScreenState =
     | SetEndYear of string
     | ReturnedModels of string[]
     | AddBike of BikeRange
-    | BikeAdded of string
+    | BikeAdded of BikeRange

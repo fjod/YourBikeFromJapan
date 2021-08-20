@@ -9,7 +9,7 @@ type UIState =
 
 
 type Model = {
-    UserRequestedBikes : Bike[]
+    UserRequestedBikes : BikeRange[]
     Input: string
     LoginState : string
     InputData : LoginInfo
