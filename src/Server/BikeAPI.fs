@@ -7,7 +7,7 @@ open System.Text
 open System.Text.Json
 open System.Text.Json.Serialization
 open Shared
-
+open FSharp.Control.Tasks.V2
 
 [<CLIMutable>]
 type Id = {
@@ -64,6 +64,24 @@ let createUriByParams(input:BikeRange)(volume:string) =
      .Append("%5B%5D=auc&auction%5B%5D=bds&auction%5B%5D=jba&auction%5B%5D=arai&date=all")
      .Append($"&volume={volume}&manufacturer={manufacturerLetter}&model=")
      .ToString()
+
+let requestBike2 (uri:string) =
+    task{
+        let message = new HttpRequestMessage(HttpMethod.Get, uri)
+        message.Headers.Add ( "Host", "projapan.ru" )
+        message.Headers.Add ( HttpRequestHeader.ContentType.ToString(), "application/json; charset=utf-8" )
+        message.Headers.Add ( "Accept", "*/*" )
+        message.Headers.Add ( "Connection", "keep-alive" )
+        let! response = client.SendAsync(message)
+        response.EnsureSuccessStatusCode () |> ignore
+        let! content = response.Content.ReadAsStringAsync()
+        let json = JsonSerializer.Deserialize<Root> content
+        let conv = Seq.map (fun b ->  {Manufacturer = Honda
+                                       Model = b.model
+                                       Year = 0
+                                      }) json.bikes
+        return conv
+    }
 
 let requestBike (uri:string) : Async<Bike seq> =
     async{

@@ -4,4 +4,4 @@ open Client.ClientModel
 open Feliz.Bulma
 
 let containerBikesHistory (model: Model) =
-    Bulma.button.button "Click me"
+    Bulma.button.button "not implemented"

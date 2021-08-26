@@ -21,7 +21,8 @@ let workWithLogin (model: Model) (msg: LoginState) (todosApi: ITodosApi) : Model
     | LoginState.LogInResult data ->
         { model with
               LoginState = getVal data.Message
-              Token = data.Token },
+              Token = data.Token
+              State = BikesScreen },
         Cmd.none
 
 

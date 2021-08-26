@@ -3,16 +3,15 @@
 open Client
 open Client.ClientModel
 open Client.MessageTypes
-open Client.MessageTypes
 open Elmish
 open Shared
 open Cookies
 
-let token = findTokenValue()
+
 
 let requestBikeModelsIfPossible(model: Model) (todosApi: ITodosApi) :  Cmd<BikeScreenState> =
     let range = BikeRangeFromModel model
-    match range, token with
+    match range, findTokenValue() with
     | Some r, Ok t ->
         Cmd.OfAsync.perform todosApi.getBikesFromRange (t,r)  BikeScreenState.ReturnedModels
     | _ -> Cmd.none
@@ -25,7 +24,7 @@ let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi)
    | SelectedManufacturerName v -> {model with SelectedManufacturer = Some v}, requestBikeModelsIfPossible model todosApi
    | SelectedModel v -> {model with SelectedModel = Some v}, Cmd.none
    | AddBike r ->
-       match token with
+       match findTokenValue() with
        | Ok t ->
             let result = Cmd.OfAsync.perform todosApi.addBike (t,r)  BikeScreenState.BikeAdded
             model, result

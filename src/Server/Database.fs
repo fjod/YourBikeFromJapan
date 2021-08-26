@@ -37,3 +37,28 @@ let createUser(email:string) (inputPassword:string)=
                                      printfn "%s" e.Message
                                      return Error e.Message
        } |> Async.RunSynchronously
+
+//create table if not exists BikeModel
+//(
+//	id int auto_increment
+//		primary key,
+//	Maker varchar(10) not null,
+//	Model varchar(30) not null,
+//	Year smallint null
+//);
+//
+//create index BikeModel__index
+//	on BikeModel (Maker);
+
+//create table if not exists User
+//(
+//	id int auto_increment
+//		primary key,
+//	email varchar(50) not null,
+//	password varchar(64) not null,
+//	salt varchar(64) not null,
+//	constraint User_email_uindex
+//		unique (email)
+//);
+
+

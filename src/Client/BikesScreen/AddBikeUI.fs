@@ -12,13 +12,18 @@ open Fable.FontAwesome
 open Microsoft.FSharp.Reflection
 open Client.MessageTypes
 
-let createManufacturerDropdown (dispatch: Msg2 -> unit) =
+let getCurrentManufacturer (model : Model) =
+    match model.SelectedManufacturer with
+    | Some m -> m
+    | None -> "Select Maker"
+
+let createManufacturerDropdown (model : Model) (dispatch: Msg2 -> unit) =
     let cases = FSharpType.GetUnionCases typeof<Manufacturer>
     Dropdown.dropdown [ Dropdown.IsHoverable
                          ] [
         Dropdown.trigger [] [
             Button.button [] [
-                span [] [ str "Select Maker" ]
+                span [] [ str (getCurrentManufacturer model) ]
                 Icon.icon [ Icon.Size IsSmall ] [
                     Fa.i [ Fa.Solid.AngleDown ] []
                 ]
@@ -109,7 +114,7 @@ let AddBikeEvent (model: Model) (dispatch: Msg2 -> unit)=
 
 let containerAddBike (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.container [ prop.children [
-        createManufacturerDropdown(dispatch)
+        createManufacturerDropdown  model dispatch
         createStartYear model dispatch
         createEndYear model dispatch
         createModelsDropdown model dispatch
