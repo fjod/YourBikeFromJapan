@@ -9,46 +9,50 @@ open System.Text.Json.Serialization
 open Shared
 open FSharp.Control.Tasks.V2
 
+
+let options = JsonSerializerOptions()
+options.Converters.Add(JsonFSharpConverter())
+
 [<CLIMutable>]
 type Id = {
     [<JsonPropertyName("$oid")>]
-    Oid:string
+    Oid:string option
 }
 
 [<CLIMutable>]
-type MetaData = {ranking_status : string}
+type MetaData = {ranking_status : string option}
 
 [<CLIMutable>]
 type APIBike = {
-       metadata : MetaData;
-      _id : Id;
-         auction : string;
-          bid_number :int;
-          category : Object;
-          condition_engine :string;
-          condition_exterior : string;
-          condition_frame : string;
-          condition_front : string;
-          condition_parts : string;
-          condition_rear :string;
-          date : string;
-          engine_volume :int;
-          final_bid :int;
-          final_bid_rub : int;
-          frame_number :string;
-          key :string;
-          lane :Object;
-          manufacturer :string;
-          mileage :int;
-          model :string;
-          model_alise :string;
-          preview_image :string;
-          rank: string;
-          result :string;
-          starting_bid : int;
-          starting_bid_rub : int;
-          state : Object;
-          year :int;
+       metadata : MetaData option;
+      _id : Id option;
+         auction : string option;
+          bid_number :int option;
+          category : Object option;
+          condition_engine :string option;
+          condition_exterior : string option;
+          condition_frame : string option;
+          condition_front : string option;
+          condition_parts : string option;
+          condition_rear :string option;
+          date : string option;
+          engine_volume :int option;
+          final_bid :int option;
+          final_bid_rub : int option;
+          frame_number :string option;
+          key :string option;
+          lane :Object option;
+          manufacturer :string option;
+          mileage :int option;
+          model :string option;
+          model_alise :string option;
+          preview_image :string option;
+          rank: string option;
+          result :string option;
+          starting_bid : int option;
+          starting_bid_rub : int option;
+          state : Object option;
+          year :int option;
 }
 
 [<CLIMutable>]
@@ -65,6 +69,12 @@ let createUriByParams(input:BikeRange)(volume:string) =
      .Append($"&volume={volume}&manufacturer={manufacturerLetter}&model=")
      .ToString()
 
+let bikeFromApi (api:APIBike) =
+        match api.model with
+        | Some m -> Some {Manufacturer = Honda
+                          Model = m
+                          Year = 0   }
+        | None ->  None
 let requestBike2 (uri:string) =
     task{
         let message = new HttpRequestMessage(HttpMethod.Get, uri)
@@ -76,14 +86,13 @@ let requestBike2 (uri:string) =
         response.EnsureSuccessStatusCode () |> ignore
         let! content = response.Content.ReadAsStringAsync()
         let json = JsonSerializer.Deserialize<Root> content
-        let conv = Seq.map (fun b ->  {Manufacturer = Honda
-                                       Model = b.model
-                                       Year = 0
-                                      }) json.bikes
+        let conv = Seq.map (fun b ->  bikeFromApi b) json.bikes
         return conv
     }
 
-let requestBike (uri:string) : Async<Bike seq> =
+let requestBike (uri:string)  : Async<Bike option seq> =
+
+
     async{
         let message = new HttpRequestMessage(HttpMethod.Get, uri)
         message.Headers.Add ( "Host", "projapan.ru" )
@@ -93,11 +102,8 @@ let requestBike (uri:string) : Async<Bike seq> =
         let! response = client.SendAsync(message) |> Async.AwaitTask
         response.EnsureSuccessStatusCode () |> ignore
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-        let json = JsonSerializer.Deserialize<Root> content
-        let conv = Seq.map (fun b ->  {Manufacturer = Honda
-                                       Model = b.model
-                                       Year = 0
-                                      }) json.bikes
+        let json = JsonSerializer.Deserialize<Root> (content,options)
+        let conv = Seq.map (fun b ->  bikeFromApi b) json.bikes
         return conv
     }
 
@@ -106,6 +112,8 @@ let createAllRequests (uri:string -> string) =
 
 
 let getBikeModelsForRange  (input:BikeRange): string[] =
+
     let request = createUriByParams input
-    createAllRequests request  |> Async.Parallel  |> Async.RunSynchronously |> Seq.collect id |> Seq.map (fun b -> b.Model) |>  Seq.toArray
+    createAllRequests request  |> Async.Parallel  |> Async.RunSynchronously
+                               |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model) |> Seq.toArray
 

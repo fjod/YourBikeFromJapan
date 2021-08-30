@@ -5,3 +5,4 @@ jose-jwt
 FsConfig
 Dapper.FSharp
 TaskBuilder.fs
+FSharp.SystemTextJson
