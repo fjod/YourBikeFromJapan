@@ -85,13 +85,13 @@ let main argv =
 
     async {
 
-        use conn = new MySqlConnection("Server=localhost;Port=3306;Database=Bikes;Uid=root;Pwd=312312;")
-        conn.Open ()
-        let! result = conn.QueryFirstOrDefaultAsync<DbUser>($"insert into User (email, password, salt) values ('5','O1r/B02i+Fkf49oGke68sFOWdKIH7jd+LpmNIEhHPF8=','9qRanZ8wuODzMuz8t1pTdU2Ydqe3bxz65sp4DziitrI=');")
-                         |> Async.AwaitTask
-        printfn "Hello world %s" result.email
-        let! result = conn.QueryFirstOrDefaultAsync<DbUser>($"select * from User where email = '1' limit 1") |> Async.AwaitTask
-        printfn "Hello world %s" result.email
+//        use conn = new MySqlConnection("Server=localhost;Port=3306;Database=Bikes;Uid=root;Pwd=312312;")
+//        conn.Open ()
+//        let! result = conn.QueryFirstOrDefaultAsync<DbUser>($"insert into User (email, password, salt) values ('5','O1r/B02i+Fkf49oGke68sFOWdKIH7jd+LpmNIEhHPF8=','9qRanZ8wuODzMuz8t1pTdU2Ydqe3bxz65sp4DziitrI=');")
+//                         |> Async.AwaitTask
+//        printfn "Hello world %s" result.email
+//        let! result = conn.QueryFirstOrDefaultAsync<DbUser>($"select * from User where email = '1' limit 1") |> Async.AwaitTask
+//        printfn "Hello world %s" result.email
         let message = new HttpRequestMessage(HttpMethod.Get, request)
         message.Headers.Add ( "Host", "projapan.ru" )
         message.Headers.Add ( HttpRequestHeader.ContentType.ToString(), "application/json; charset=utf-8" )

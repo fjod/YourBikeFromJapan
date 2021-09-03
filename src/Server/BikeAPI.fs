@@ -69,26 +69,21 @@ let createUriByParams(input:BikeRange)(volume:string) =
      .Append($"&volume={volume}&manufacturer={manufacturerLetter}&model=")
      .ToString()
 
-let bikeFromApi (api:APIBike) =
-        match api.model with
-        | Some m -> Some {Manufacturer = Honda
-                          Model = m
-                          Year = 0   }
-        | None ->  None
-let requestBike2 (uri:string) =
-    task{
-        let message = new HttpRequestMessage(HttpMethod.Get, uri)
-        message.Headers.Add ( "Host", "projapan.ru" )
-        message.Headers.Add ( HttpRequestHeader.ContentType.ToString(), "application/json; charset=utf-8" )
-        message.Headers.Add ( "Accept", "*/*" )
-        message.Headers.Add ( "Connection", "keep-alive" )
-        let! response = client.SendAsync(message)
-        response.EnsureSuccessStatusCode () |> ignore
-        let! content = response.Content.ReadAsStringAsync()
-        let json = JsonSerializer.Deserialize<Root> content
-        let conv = Seq.map (fun b ->  bikeFromApi b) json.bikes
-        return conv
-    }
+let mapBike (api:APIBike) :  Bike option =
+    match api.manufacturer, api.model, api.year, api.key, api.mileage, api.preview_image with
+    | Some man, Some model, Some y, Some k, Some mil, Some im ->
+                          let manufacturer = BikeRangeHelper.ManufacturerFromLetter man
+                          match manufacturer with
+                          |Some m ->
+                              Some {  Manufacturer = m
+                                      Model = model
+                                      Year = y
+                                      Key = k
+                                      Mileage = mil
+                                      Image = $"https://projapan.ru{im}"
+                                   }
+                          | None -> None
+    | _ -> None
 
 let requestBike (uri:string)  : Async<Bike option seq> =
 
@@ -103,7 +98,7 @@ let requestBike (uri:string)  : Async<Bike option seq> =
         response.EnsureSuccessStatusCode () |> ignore
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
         let json = JsonSerializer.Deserialize<Root> (content,options)
-        let conv = Seq.map (fun b ->  bikeFromApi b) json.bikes
+        let conv = Seq.map (fun b ->  mapBike b) json.bikes
         return conv
     }
 

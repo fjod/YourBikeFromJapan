@@ -7,14 +7,15 @@ type Manufacturer =
     | Suzuki
     | Kawasaki
     | Yamaha
-    | BMW
-    | Ducati
 
 
 type Bike = {
     Manufacturer : Manufacturer
     Model : string
     Year : int
+    Key:string
+    Mileage : int
+    Image : string
 }
 
 type BikeRange= {
@@ -31,10 +32,17 @@ module BikeRangeHelper =
         | Some "Suzuki" -> Some Suzuki
         | Some "Kawasaki" -> Some Kawasaki
         | Some "Yamaha" -> Some Yamaha
-        | Some "BMW" -> Some BMW
-        | Some "Ducati" -> Some Ducati
         | Some _ -> None
         | None -> None
+
+    let ManufacturerFromLetter (letter : string ) : Manufacturer option =
+         match letter with
+            |  "H" -> Some Honda
+            |  "S" -> Some Suzuki
+            |  "K" -> Some Kawasaki
+            |  "Y" -> Some Yamaha
+            |  _ -> None
+
 
 type LoginInfo = {Email:string; Password:string}
 
@@ -71,6 +79,15 @@ type DbUser = {
     email : string
     password : string
     salt : string
+}
+
+type AuctionData = {
+    id : int
+    Manufacturer : string
+    Mileage : int
+    Img : string
+    Year : int
+    BikeKey : string
 }
 
 type AppUser = {

@@ -38,6 +38,23 @@ let createUser(email:string) (inputPassword:string)=
                                      return Error e.Message
        } |> Async.RunSynchronously
 
+let UploadBike (connection:MySqlConnection) (bike:Bike) =
+    async{
+         let! _ = connection.ExecuteScalarAsync($"insert into AuctionData (Manufacturer, Mileage, Img, Year, BikeKey, ScrapedAt)
+                                                  values ('{bike.Manufacturer}','{bike.Mileage}','{bike.Image}'),
+                                                  '{bike.Year}'),'{bike.Key}'),'{DateTime.Today}');")
+                             |> Async.AwaitTask
+         ()
+    }|> Async.RunSynchronously
+
+
+let uploadAuctionData (bikes : Bike seq) =
+    let z = getSettings
+    use connection = new MySqlConnection(z.connectionString)
+    let upload = UploadBike connection
+    Seq.iter upload bikes
+
+
 //create table if not exists BikeModel
 //(
 //	id int auto_increment
@@ -60,5 +77,30 @@ let createUser(email:string) (inputPassword:string)=
 //	constraint User_email_uindex
 //		unique (email)
 //);
+//create table BikesForUser
+//(
+//    User      int not null,
+//    BikeModel int not null,
+//    StartYear int not null,
+//    EndYear   int not null,
+//    constraint BikesForUser_BikeModel_id_fk
+//        foreign key (BikeModel) references BikeModel (id),
+//    constraint BikesForUser_User_id_fk
+//        foreign key (User) references User (id)
+//);
+//create table AuctionData
+//(
+//	id int auto_increment,
+//	Manufacturer varchar(15) not null,
+//	Mileage int not null,
+//	Img varchar(100) null,
+//	Year int not null,
+//	BikeKey varchar(20) not null,
+//   ScrapedAt    datetime     not null,
+//	constraint AuctionData_pk
+//		primary key (id)
+//);
+
+
 
 
