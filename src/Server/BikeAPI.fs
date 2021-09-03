@@ -115,5 +115,6 @@ let getBikeModelsForRange  (input:BikeRange): string[] =
 
     let request = createUriByParams input
     createAllRequests request  |> Async.Parallel  |> Async.RunSynchronously
-                               |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model) |> Seq.toArray
+                               |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model)
+                               |> Seq.distinctBy (fun b -> b.Trim()) |> Seq.toArray
 

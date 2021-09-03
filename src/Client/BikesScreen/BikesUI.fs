@@ -13,8 +13,9 @@ let containerBikes (model: Model) (dispatch: Msg2 -> unit) =
      Bulma.box[
         Bulma.columns [
             Bulma.column [
-                column.is2
+                column.is3
                 prop.children [
+
                     containerWithRequestedBikes model dispatch
                     containerAddBike model dispatch
                 ]
@@ -24,7 +25,7 @@ let containerBikes (model: Model) (dispatch: Msg2 -> unit) =
                 prop.children [
                     Bulma.button.button [
                         Bulma.color.isSuccess
-                        prop.text "Get all bikes"
+                        prop.text "All data"
                     ]
                     containerBikesHistory(model)
                 ]

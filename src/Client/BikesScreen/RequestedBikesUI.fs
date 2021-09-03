@@ -10,8 +10,12 @@ open Shared
 let containerWithRequestedBikes (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.container[
         prop.children[
-            for bike in model.UserRequestedBikes ->
-                Bulma.button.button [ prop.text ($"bike.Model {bike.StartYear} - {bike.EndYear}") ] //TODO: dispatch command on user click button
+            Bulma.panel[
+                        for bike in model.UserRequestedBikes ->
+                            Bulma.panelBlock.div[
+                                Bulma.button.button [ prop.text ($"bike.Model {bike.StartYear} - {bike.EndYear}") ] //TODO: dispatch command on user click button
+                            ]
+                ]
         ]
     ]
     //Bulma.button.button "Click me"

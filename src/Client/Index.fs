@@ -94,17 +94,18 @@ let view (model: Model) (dispatch: Msg2 -> unit) =
             ]
             Bulma.heroBody [
                 Bulma.container [
-                    Bulma.column [
-                        column.is12 //TODO: use proper hero column styles for login/bikes screens
-                        column.isOffset1
-                        prop.children [
-                            Bulma.title [
-                                text.hasTextCentered
-                                prop.text "YourBikeFromJapan"
-                            ]
-                            getCurrentView model dispatch
-                        ]
-                    ]
+//                    Bulma.column [
+//                        column.is12 //TODO: use proper hero column styles for login/bikes screens
+//                        column.isOffset1
+//                        prop.children [
+//                            Bulma.title [
+//                                text.hasTextCentered
+//                                prop.text "YourBikeFromJapan"
+//                            ]
+//                            getCurrentView model dispatch
+//                        ]
+//                    ]
+                    getCurrentView model dispatch
                 ]
             ]
         ]

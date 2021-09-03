@@ -18,10 +18,11 @@ let requestBikeModelsIfPossible(model: Model) (todosApi: ITodosApi) :  Cmd<BikeS
 
 
 let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi) : Model * Cmd<BikeScreenState> =
+
    match msg with
-   | SetStartYear v -> {model with StartYear = Some v}, requestBikeModelsIfPossible model todosApi
-   | SetEndYear v -> {model with EndYear = Some v} , requestBikeModelsIfPossible model todosApi
-   | SelectedManufacturerName v -> {model with SelectedManufacturer = Some v}, requestBikeModelsIfPossible model todosApi
+   | SetStartYear v -> {model with StartYear = Some v}, requestBikeModelsIfPossible {model with StartYear = Some v} todosApi
+   | SetEndYear v -> {model with EndYear = Some v} , requestBikeModelsIfPossible {model with EndYear = Some v} todosApi
+   | SelectedManufacturerName v -> {model with SelectedManufacturer = Some v}, requestBikeModelsIfPossible {model with SelectedManufacturer = Some v} todosApi
    | SelectedModel v -> {model with SelectedModel = Some v}, Cmd.none
    | AddBike r ->
        match findTokenValue() with

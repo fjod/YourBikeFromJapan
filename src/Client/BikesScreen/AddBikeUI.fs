@@ -114,10 +114,13 @@ let AddBikeEvent (model: Model) (dispatch: Msg2 -> unit)=
 
 let containerAddBike (model: Model) (dispatch: Msg2 -> unit) =
     Bulma.container [ prop.children [
-        createManufacturerDropdown  model dispatch
-        createStartYear model dispatch
-        createEndYear model dispatch
-        createModelsDropdown model dispatch
+        Bulma.panel[
+            Bulma.panelHeading [ prop.text "Добавить" ]
+            Bulma.panelBlock.div [ createManufacturerDropdown  model dispatch]
+            Bulma.panelBlock.div [ createStartYear model dispatch]
+            Bulma.panelBlock.div [createEndYear model dispatch]
+            Bulma.panelBlock.div [createModelsDropdown model dispatch]
+        ]
         Bulma.control.p [
                     Bulma.button.a [
                         color.isPrimary

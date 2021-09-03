@@ -4,4 +4,4 @@ open Client.ClientModel
 open Feliz.Bulma
 
 let containerAuctData (model: Model) =
-    Bulma.button.button "not impelented"
+    Bulma.button.button "auct data"
