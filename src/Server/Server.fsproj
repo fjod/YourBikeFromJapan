@@ -7,9 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
-    <Compile Include="BikeAPI.fs" />
     <Compile Include="Environment.fs" />
     <Compile Include="Security.fs" />
+    <Compile Include="BikeAPI.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="BikeScreen.fs" />
     <Compile Include="WelcomeScreen.fs" />

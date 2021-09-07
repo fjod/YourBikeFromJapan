@@ -40,20 +40,53 @@ let createUser(email:string) (inputPassword:string)=
 
 let UploadBike (connection:MySqlConnection) (bike:Bike) =
     async{
+         let m = BikeRangeHelper.BikeRangeToString bike.Manufacturer
          let! _ = connection.ExecuteScalarAsync($"insert into AuctionData (Manufacturer, Mileage, Img, Year, BikeKey, ScrapedAt)
-                                                  values ('{bike.Manufacturer}','{bike.Mileage}','{bike.Image}'),
+                                                  values ('{m}','{bike.Mileage}','{bike.Image}'),
                                                   '{bike.Year}'),'{bike.Key}'),'{DateTime.Today}');")
                              |> Async.AwaitTask
          ()
-    }|> Async.RunSynchronously
+    }
 
+let GetBikesKeys (connection : MySqlConnection) =
+   async {
+        let! result = connection.QueryAsync<string>($"select BikeKey from AuctionData") |> Async.AwaitTask
+        return result
+    }
 
 let uploadAuctionData (bikes : Bike seq) =
-    let z = getSettings
-    use connection = new MySqlConnection(z.connectionString)
-    let upload = UploadBike connection
-    Seq.iter upload bikes
+    async {
+        let z = getSettings
+        use connection = new MySqlConnection(z.connectionString)
+        let upload = UploadBike connection
+        let! presentBikes = GetBikesKeys connection
+        let pb = presentBikes.AsList()
+        bikes |> Seq.where (fun b -> not (pb.Contains(b.Key))) |> Seq.iter (fun b -> upload b |> ignore)
+    }
 
+let getBikeIdFromRange (bike:BikeRange) (connection : MySqlConnection)=
+    async {
+        let m = BikeRangeHelper.BikeRangeToString bike.Maker
+        let! result = connection.QueryAsync<int>($"select id from BikeModel where Year >= {bike.StartYear}
+                                                 and Year <= {bike.EndYear} and Model == {bike.Model} and Maker == {m} and Model == {bike.Model}") |> Async.AwaitTask
+        return result
+    }
+
+
+let addBikeToSearch (bike: BikeRange) (user : DbUser) =
+   async{
+         let z = getSettings
+         use connection = new MySqlConnection(z.connectionString)
+
+         let! id = getBikeIdFromRange bike connection
+         let asList = id.AsList()
+         if (asList.Count > 0) then
+             let userId = asList.[0]
+             let! _ = connection.ExecuteScalarAsync($"insert into BikesForUser (User, BikeModel, StartYear, EndYear)
+                                                      values ('{user.id}','{userId}','{bike.StartYear}','{bike.EndYear}');")
+                                 |> Async.AwaitTask
+             ()
+    }//|> Async.RunSynchronously
 
 //create table if not exists BikeModel
 //(

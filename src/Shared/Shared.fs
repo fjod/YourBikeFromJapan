@@ -42,7 +42,12 @@ module BikeRangeHelper =
             |  "K" -> Some Kawasaki
             |  "Y" -> Some Yamaha
             |  _ -> None
-
+    let BikeRangeToString (m :Manufacturer) =
+        match m with
+        | Honda -> "Honda"
+        | Kawasaki -> "Kawasaki"
+        | Yamaha -> "Yamaha"
+        | Suzuki -> "Suzuki"
 
 type LoginInfo = {Email:string; Password:string}
 
@@ -56,13 +61,7 @@ module Route =
     let builder typeName methodName =
         sprintf "/api/%s/%s" typeName methodName
 
-type ITodosApi =
-    { login: LoginInfo -> Async<LoginResult>
-      register: LoginInfo -> Async<LoginResult>
-      validateToken: string -> Async<bool>
-      addBike: string*BikeRange ->Async<BikeRange> //return range of bikes and save it to model
-      getBikesFromRange:string*BikeRange->Async<string[]>
-    }
+
 
 type SecureRequest<'t> = {
     Token : string
@@ -72,6 +71,8 @@ type SecureRequest<'t> = {
 type AuthError =
     | TokenInvalid
     | UserUnauthorized
+    | NoUserForEmail
+
 type SecureResponse<'t> = Async<Result<'t, AuthError>>
 
 type DbUser = {
@@ -80,6 +81,14 @@ type DbUser = {
     password : string
     salt : string
 }
+
+type ITodosApi =
+    { login: LoginInfo -> Async<LoginResult>
+      register: LoginInfo -> Async<LoginResult>
+      validateToken: string -> Async<bool>
+      addBike: string*BikeRange ->Async<Result<BikeRange,AuthError>> //return range of bikes and save it to model
+      getBikesFromRange:string*BikeRange->Async<string[]>
+    }
 
 type AuctionData = {
     id : int

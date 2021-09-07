@@ -31,7 +31,10 @@ let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi)
             model, result
        | Error e ->  model, Cmd.none
    | BikeAdded bike->
-       let test = Array.append model.UserRequestedBikes [|bike|]
-       {model with UserRequestedBikes = test}, Cmd.none //user added bike; display it somewhere ?
+       match bike with
+       | Ok b ->
+            let test = Array.append model.UserRequestedBikes [|b|]
+            {model with UserRequestedBikes = test}, Cmd.none //user added bike; display it somewhere ?
+       | Error _ ->    model,   Cmd.none
    | ReturnedModels models ->
        {model with Models = models}, Cmd.none

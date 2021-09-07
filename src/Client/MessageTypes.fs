@@ -23,4 +23,4 @@ type BikeScreenState =
     | SetEndYear of string
     | ReturnedModels of string[]
     | AddBike of BikeRange
-    | BikeAdded of BikeRange
+    | BikeAdded of Result<BikeRange,AuthError>

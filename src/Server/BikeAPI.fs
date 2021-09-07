@@ -74,7 +74,7 @@ let mapBike (api:APIBike) :  Bike option =
     | Some man, Some model, Some y, Some k, Some mil, Some im ->
                           let manufacturer = BikeRangeHelper.ManufacturerFromLetter man
                           match manufacturer with
-                          |Some m ->
+                          | Some m ->
                               Some {  Manufacturer = m
                                       Model = model
                                       Year = y
