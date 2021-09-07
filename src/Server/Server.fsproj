@@ -13,6 +13,7 @@
     <Compile Include="Database.fs" />
     <Compile Include="BikeScreen.fs" />
     <Compile Include="WelcomeScreen.fs" />
+    <Compile Include="RecurringJob.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>
   <ItemGroup>

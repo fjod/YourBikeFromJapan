@@ -1,6 +1,7 @@
 module Server.Server
 
 
+open System
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 
@@ -29,7 +30,6 @@ let webApp =
 
 let app =
     application {
-
         url "http://0.0.0.0:8085"
         use_router webApp
         memory_cache
@@ -37,5 +37,7 @@ let app =
         use_gzip
     }
 
+//fire-and-forget function
+Console.Write "test"
 
 run app

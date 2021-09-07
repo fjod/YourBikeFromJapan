@@ -50,7 +50,7 @@ let UploadBike (connection:MySqlConnection) (bike:Bike) =
 
 let GetBikesKeys (connection : MySqlConnection) =
    async {
-        let! result = connection.QueryAsync<string>($"select BikeKey from AuctionData") |> Async.AwaitTask
+        let! result = connection.QueryAsync<string>("select BikeKey from AuctionData") |> Async.AwaitTask
         return result
     }
 
@@ -86,7 +86,24 @@ let addBikeToSearch (bike: BikeRange) (user : DbUser) =
                                                       values ('{user.id}','{userId}','{bike.StartYear}','{bike.EndYear}');")
                                  |> Async.AwaitTask
              ()
-    }//|> Async.RunSynchronously
+    }
+
+type BikeToSearch= {
+    Maker : string
+    Model : string
+    StartYear : string
+    EndYear : string
+}
+
+let getBikesForUsers()=
+    async{
+         let z = getSettings
+         use connection = new MySqlConnection(z.connectionString)
+         let! result = connection.QueryAsync<BikeToSearch>("select BU.StartYear, BU.EndYear, BM.Maker, BM.Model from BikesForUser BU join BikeModel BM on BM.id = BU.BikeModel")
+                       |> Async.AwaitTask
+         return result
+    }
+
 
 //create table if not exists BikeModel
 //(
