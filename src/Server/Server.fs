@@ -10,6 +10,7 @@ open Saturn
 open Shared
 open Server.WelcomeScreen
 open Server.BikeScreen
+open RecurringJob
 //https://github.com/demystifyfp/FsConfig  look for env vars
 
 let todosApi =
@@ -38,6 +39,6 @@ let app =
     }
 
 //fire-and-forget function
-Console.Write "test"
+prefill()
 
 run app

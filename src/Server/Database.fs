@@ -41,9 +41,9 @@ let createUser(email:string) (inputPassword:string)=
 let UploadBike (connection:MySqlConnection) (bike:Bike) =
     async{
          let m = BikeRangeHelper.BikeRangeToString bike.Manufacturer
-         let! _ = connection.ExecuteScalarAsync($"insert into AuctionData (Manufacturer, Mileage, Img, Year, BikeKey, ScrapedAt)
+         let! _ = connection.ExecuteScalarAsync($"insert into AuctionData (Manufacturer, Mileage, Img, Year, BikeKey, ScrapedAt, Model)
                                                   values ('{m}','{bike.Mileage}','{bike.Image}'),
-                                                  '{bike.Year}'),'{bike.Key}'),'{DateTime.Today}');")
+                                                  '{bike.Year}'),'{bike.Key}'),'{DateTime.Today}', {bike.Model});")
                              |> Async.AwaitTask
          ()
     }
@@ -105,6 +105,28 @@ let getBikesForUsers()=
     }
 
 
+let fillBikeModelTable(vals: (string*Manufacturer*int) seq) =
+   Console.WriteLine (" started upload to db")
+   let upload (model,maker,year,connection:MySqlConnection)=
+        async{
+            let! _ = connection.ExecuteScalarAsync($"insert into BikeModel (Maker, Model, Year)
+                                                      values ('{maker}','{model}','{year}');")
+                                 |> Async.AwaitTask
+            ()
+            }
+
+   let z = getSettings
+   use connection = new MySqlConnection(z.connectionString)
+   vals |> Seq.iter (fun v ->
+             let model,maker,year = v
+             let _ = upload (model, maker, year, connection)
+             ()
+             )
+   Console.WriteLine (" finished upload to db")
+   ()
+
+
+
 //create table if not exists BikeModel
 //(
 //	id int auto_increment
@@ -140,16 +162,17 @@ let getBikesForUsers()=
 //);
 //create table AuctionData
 //(
-//	id int auto_increment,
-//	Manufacturer varchar(15) not null,
-//	Mileage int not null,
-//	Img varchar(100) null,
-//	Year int not null,
-//	BikeKey varchar(20) not null,
-//   ScrapedAt    datetime     not null,
-//	constraint AuctionData_pk
-//		primary key (id)
+//    id           int auto_increment
+//        primary key,
+//    Manufacturer varchar(15)  not null,
+//    Mileage      int          not null,
+//    Img          varchar(100) null,
+//    Year         int          not null,
+//    BikeKey      varchar(20)  not null,
+//    ScrapedAt    datetime     not null,
+//    Model        varchar(20)  not null
 //);
+
 
 
 

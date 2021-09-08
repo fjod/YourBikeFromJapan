@@ -99,6 +99,8 @@ let requestBike (uri:string)  : Async<Bike option seq> =
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
         let json = JsonSerializer.Deserialize<Root> (content,options)
         let conv = Seq.map (fun b ->  mapBike b) json.bikes
+
+        Console.WriteLine (uri + " returned some info")
         return conv
     }
 
@@ -113,3 +115,11 @@ let getBikeModelsForRange  (input:BikeRange): string[] =
                                |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model)
                                |> Seq.distinctBy (fun b -> b.Trim()) |> Seq.toArray
 
+
+let getDBBikeModelsForRange  (input:BikeRange) =
+
+    let request = createUriByParams input
+    createAllRequests request  |> Async.Parallel  |> Async.RunSynchronously
+                               |> Seq.collect id |> Seq.choose id
+                               |> Seq.distinctBy (fun b-> b.Model.Trim())
+                               |> Seq.map (fun b -> (b.Model,b.Manufacturer,b.Year))
