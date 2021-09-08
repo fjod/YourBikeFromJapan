@@ -27,12 +27,12 @@ let wait5AndCall(range:BikeRange) =
     r
 
 let prefill() =
+ async{
     let (yamahaRange:BikeRange) = {Maker = Yamaha; Model = ""; StartYear = "2000"; EndYear = "2020"}
     let kawaRange = {yamahaRange with Maker = Kawasaki}
     let hondaRange = {yamahaRange with Maker = Honda}
     let sRange = {yamahaRange with Maker = Suzuki}
-
     let ranges = [|yamahaRange;kawaRange;hondaRange;sRange|]
-    ranges |> Array.map wait5AndCall |> Array.ofSeq |> Seq.iter fillBikeModelTable
 
-    ()
+    ranges |> Array.map wait5AndCall |> Array.ofSeq |> Seq.map fillBikeModelTable |> Async.Sequential |> ignore
+    }

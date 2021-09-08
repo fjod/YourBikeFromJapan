@@ -15,8 +15,8 @@ open RecurringJob
 
 let todosApi =
     {
-      login = fun data -> async { return login(data) }
-      register = fun data -> async { return register(data) }
+      login = fun data -> async { return! login(data) }
+      register = fun data -> async { return! register(data) }
       validateToken = fun data -> async { return validate(data) }
       addBike = fun data -> async {return addBikeFun(data) }
       getBikesFromRange = fun data -> async { return getBikeModels(data) }
@@ -39,6 +39,6 @@ let app =
     }
 
 //fire-and-forget function
-prefill()
+prefill() |> Async.Start
 
 run app

@@ -15,7 +15,7 @@ let getUserByEmail(email:string) =
        use connection = new MySqlConnection(z.connectionString)
        let! result = connection.QueryFirstOrDefaultAsync<DbUser>($"select * from User where email = '{email}' limit 1") |> Async.AwaitTask
        return convert result
-   } |> Async.RunSynchronously
+   }
 
 let createUser(email:string) (inputPassword:string)=
     let salt = createRandomKey()
@@ -36,7 +36,7 @@ let createUser(email:string) (inputPassword:string)=
              | :? Exception as e  ->
                                      printfn "%s" e.Message
                                      return Error e.Message
-       } |> Async.RunSynchronously
+       }
 
 let UploadBike (connection:MySqlConnection) (bike:Bike) =
     async{
@@ -88,42 +88,61 @@ let addBikeToSearch (bike: BikeRange) (user : DbUser) =
              ()
     }
 
-type BikeToSearch= {
+type DBBikeToSearch= {
+    Maker : string
+    MinYear : string
+    MaxYear : string
+}
+type DbBikeModel ={
     Maker : string
     Model : string
-    StartYear : string
-    EndYear : string
+    Year : int
 }
+
+let GetAllBikeModels() =
+    async {
+         let z = getSettings
+         use connection = new MySqlConnection(z.connectionString)
+         let! result = connection.QueryAsync<DbBikeModel>("select * from BikeModel")
+                       |> Async.AwaitTask
+         return result
+    }
 
 let getBikesForUsers()=
     async{
          let z = getSettings
          use connection = new MySqlConnection(z.connectionString)
-         let! result = connection.QueryAsync<BikeToSearch>("select BU.StartYear, BU.EndYear, BM.Maker, BM.Model from BikesForUser BU join BikeModel BM on BM.id = BU.BikeModel")
+         let! result = connection.QueryAsync<DBBikeToSearch>("select Min(BU.StartYear) as MinYear, Max(bu.EndYear) as MaxYear, BM.Maker from BikesForUser BU join BikeModel BM on BM.id = BU.BikeModel group by  bm.Maker")
                        |> Async.AwaitTask
          return result
     }
 
 
 let fillBikeModelTable(vals: (string*Manufacturer*int) seq) =
-   Console.WriteLine (" started upload to db")
-   let upload (model,maker,year,connection:MySqlConnection)=
-        async{
-            let! _ = connection.ExecuteScalarAsync($"insert into BikeModel (Maker, Model, Year)
-                                                      values ('{maker}','{model}','{year}');")
-                                 |> Async.AwaitTask
-            ()
-            }
+   async {
 
-   let z = getSettings
-   use connection = new MySqlConnection(z.connectionString)
-   vals |> Seq.iter (fun v ->
-             let model,maker,year = v
-             let _ = upload (model, maker, year, connection)
-             ()
-             )
-   Console.WriteLine (" finished upload to db")
-   ()
+       Console.WriteLine (" started upload to db")
+       let upload (model,maker,year,connection:MySqlConnection)=
+            async{
+                let! _ = connection.ExecuteScalarAsync($"insert into BikeModel (Maker, Model, Year)
+                                                          values ('{maker}','{model}','{year}');")
+                                     |> Async.AwaitTask
+                ()
+                }
+       //need to check existing table content to avoid duplicates
+       let! existingModels = GetAllBikeModels()
+
+       let z = getSettings
+       use connection = new MySqlConnection(z.connectionString)
+       vals |> Seq.iter (fun v ->
+                 let model,maker,year = v
+                 let _ = upload (model, maker, year, connection)
+                 ()
+                 )
+       Console.WriteLine (" finished upload to db")
+       return ()
+   }
+
 
 
 
