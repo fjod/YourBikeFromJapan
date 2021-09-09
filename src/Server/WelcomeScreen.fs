@@ -26,7 +26,7 @@ let register  (data : LoginInfo)  =
        match user with
        | Ok _ ->  return { Message=Some "User is already registered"; Token=None}
        | Error _ ->
-           let r = createUser data.Email data.Password
+           let! r = createUser data.Email data.Password
            match r with
            | Ok _ ->
                 let token = createTokenForUser data.Email

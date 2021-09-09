@@ -42,7 +42,7 @@ module BikeRangeHelper =
             |  "K" -> Some Kawasaki
             |  "Y" -> Some Yamaha
             |  _ -> None
-    let BikeRangeToString (m :Manufacturer) =
+    let ManufacturerToString (m :Manufacturer) =
         match m with
         | Honda -> "Honda"
         | Kawasaki -> "Kawasaki"

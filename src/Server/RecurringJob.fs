@@ -1,4 +1,5 @@
 ﻿module Server.RecurringJob
+open FSharp.Control.Websockets
 open Shared
 open System
 open BikeAPI
@@ -17,15 +18,16 @@ let GetAuctionData()=
     ()
 
 let wait5AndCall(range:BikeRange) =
+    async {
     Console.Write "waiting with range"
     Console.WriteLine range.Maker
     let timer = new Timers.Timer(5000.)
     let event = Async.AwaitEvent timer.Elapsed |> Async.Ignore
-    let r = getDBBikeModelsForRange range
+    let! r = getDBBikeModelsForRange range
     Console.Write "got info for range"
     Console.WriteLine range.Maker
-    r
-
+    return r
+}
 let prefill() =
  async{
     let (yamahaRange:BikeRange) = {Maker = Yamaha; Model = ""; StartYear = "2000"; EndYear = "2020"}
@@ -34,5 +36,9 @@ let prefill() =
     let sRange = {yamahaRange with Maker = Suzuki}
     let ranges = [|yamahaRange;kawaRange;hondaRange;sRange|]
 
-    ranges |> Array.map wait5AndCall |> Array.ofSeq |> Seq.map fillBikeModelTable |> Async.Sequential |> ignore
+    for range in ranges do
+        let! models = wait5AndCall range
+        let! _ = fillBikeModelTable models
+        ()
+
     }

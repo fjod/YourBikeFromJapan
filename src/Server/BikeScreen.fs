@@ -1,27 +1,36 @@
 ﻿module Server.BikeScreen
+open System
+open FSharp.Control.Tasks
 
 open Shared
 open BikeAPI
 open Security
 open Database
-//TODO:validateTokens! Validate tokens everywhere!
-let addBikeFun (input:string*BikeRange): Result<BikeRange,AuthError> =
-    //for now just return what user added
-    //TODO: save it in database for user which we can get from token (fst input)
-   let checkToken = validateJwt (fst input)
-   match checkToken with
-   | Some u ->
-       let user = getUserByEmail u.Email
-       match user with
-       | Ok u ->
-           let range = snd input
-           addBikeToSearch range u |> Async.RunSynchronously
-           Ok range
-       | Error _ ->
-           Error NoUserForEmail
-   | None ->
-           Error TokenInvalid
+
+let addBikeFun (input:string*BikeRange) =
+
+   async {
+       let checkToken = validateJwt (fst input)
+       match checkToken with
+       | Some u ->
+                   let! user = getUserByEmail u.Email
+                   match user with
+                   | Ok u ->
+                       let range = snd input
+                       let! _ = addBikeToSearch range u
+                       return Ok range
+                   | Error _ ->
+                       return Error NoUserForEmail
+
+       | None ->
+              return Error TokenInvalid
+   }
 
 
-let getBikeModels (input:string*BikeRange): string[] =
+let getBikeModels (input:string*BikeRange) =
      getBikeModelsForRange (snd input)
+
+
+
+
+

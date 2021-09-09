@@ -6,9 +6,10 @@ open System.Net.Http
 open System.Text
 open System.Text.Json
 open System.Text.Json.Serialization
+open Server.Types
 open Shared
 open FSharp.Control.Tasks.V2
-
+open DbTypes
 
 let options = JsonSerializerOptions()
 options.Converters.Add(JsonFSharpConverter())
@@ -86,8 +87,6 @@ let mapBike (api:APIBike) :  Bike option =
     | _ -> None
 
 let requestBike (uri:string)  : Async<Bike option seq> =
-
-
     async{
         let message = new HttpRequestMessage(HttpMethod.Get, uri)
         message.Headers.Add ( "Host", "projapan.ru" )
@@ -98,7 +97,7 @@ let requestBike (uri:string)  : Async<Bike option seq> =
         response.EnsureSuccessStatusCode () |> ignore
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
         let json = JsonSerializer.Deserialize<Root> (content,options)
-        let conv = Seq.map (fun b ->  mapBike b) json.bikes
+        let conv = Seq.map mapBike json.bikes
 
         Console.WriteLine (uri + " returned some info")
         return conv
@@ -108,18 +107,29 @@ let createAllRequests (uri:string -> string) =
     volumes |> Array.map (fun v -> requestBike(uri(v)))
 
 
-let getBikeModelsForRange  (input:BikeRange): string[] =
+let getBikeModelsForRange  (input:BikeRange) =
 
-    let request = createUriByParams input
-    createAllRequests request  |> Async.Parallel  |> Async.RunSynchronously
-                               |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model)
+    async{
+        let request = createUriByParams input
+        let! info = createAllRequests request  |> Async.Parallel
+
+        let result = info |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model)
                                |> Seq.distinctBy (fun b -> b.Trim()) |> Seq.toArray
+        return result
+    }
+
 
 
 let getDBBikeModelsForRange  (input:BikeRange) =
 
-    let request = createUriByParams input
-    createAllRequests request  |> Async.Parallel  |> Async.RunSynchronously
-                               |> Seq.collect id |> Seq.choose id
+    async {
+         let request = createUriByParams input
+         let! info = createAllRequests request  |> Async.Parallel
+         let result =  info   |> Seq.collect id |> Seq.choose id
                                |> Seq.distinctBy (fun b-> b.Model.Trim())
-                               |> Seq.map (fun b -> (b.Model,b.Manufacturer,b.Year))
+                               |> Seq.map (fun b -> ConvertFromTuple(b.Model,b.Manufacturer,b.Year))
+         return result
+    }
+
+
+
