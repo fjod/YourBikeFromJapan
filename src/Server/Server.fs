@@ -20,6 +20,7 @@ let todosApi =
       validateToken = fun data -> async { return validate(data) }
       addBike = fun data -> async {return! addBikeFun(data) }
       getBikesFromRange = fun data -> async { return! getBikeModels(data) }
+      getBikesForUser = fun data -> async {return! getUserBikesFun(data)}
     }
 
 let webApp =

@@ -88,6 +88,7 @@ type ITodosApi =
       validateToken: string -> Async<bool>
       addBike: string*BikeRange ->Async<Result<BikeRange,AuthError>> //return range of bikes and save it to model
       getBikesFromRange:string*BikeRange->Async<string[]>
+      getBikesForUser:string->Async<Result<BikeRange[],AuthError>>
     }
 
 type AuctionData = {

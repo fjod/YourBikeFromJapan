@@ -19,12 +19,20 @@ let workWithRegister (model: Model) (msg: RegisterState) (todosApi: ITodosApi) :
     | ValidateToken tokenIsFine ->
         match tokenIsFine with
         | true ->
-            let bike1 = {Maker = Honda; StartYear = "2005"; Model = "Test"; EndYear = "2010"}
-            let bike2 = {Maker = Honda; StartYear = "2001"; Model = "Test1"; EndYear = "2011"}
-            let bike3 = {Maker = Honda; StartYear = "2002"; Model = "Test2"; EndYear = "2012"}
-            let model = { model with LoginState = "Logged in"; State = BikesScreen; UserRequestedBikes = [|bike1;bike2;bike3|] }
-            model, Cmd.none //TODO: cmd should be changed to get relevant bikes!
+            let model = { model with LoginState = "Logged in" } // State = BikesScreen;
+            let command =  RegisterState.GetBikesForUser |> Cmd.ofMsg
+            model, command
         | _ -> model, Cmd.none
+    | GetBikesForUser ->
+        match model.Token with
+        | Some t ->
+            let result = Cmd.OfAsync.perform todosApi.getBikesForUser t UserBikesResult
+            model,result
+        | _ ->  model, Cmd.none
+    |  UserBikesResult bikes->
+        match bikes with
+        | Ok b ->  {model with UserRequestedBikes = b}, Cmd.none
+        | Error e -> model, Cmd.none
     | TryValidateToken token ->
           let ret = Cmd.OfAsync.perform todosApi.validateToken token RegisterState.ValidateToken
           model,ret

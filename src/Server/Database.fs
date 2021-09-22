@@ -5,6 +5,7 @@ open System.Text
 open Dapper;
 open Fake.Core
 open MySql.Data.MySqlClient
+open Server.Types.DbTypes
 open Shared
 open Server.Environment
 open Server.Security
@@ -67,7 +68,16 @@ let getBikeIdFromRange (bike:BikeRange) (connection : MySqlConnection)=
     async {
         let m = BikeRangeHelper.ManufacturerToString bike.Maker
         let! result = connection.QueryAsync<int>($"select id from BikeModel where Year >= {bike.StartYear}
-                                                 and Year <= {bike.EndYear} and Model == {bike.Model} and Maker == {m} and Model == {bike.Model}") |> Async.AwaitTask
+                                                 and Year <= {bike.EndYear} and Model == {bike.Model} and Maker == {m}") |> Async.AwaitTask
+        return result
+    }
+
+let getModelsForRange(range:BikeRange)=
+    async {
+        use connection = new MySqlConnection(getSettings.connectionString)
+        let m = BikeRangeHelper.ManufacturerToString range.Maker
+        let! result = connection.QueryAsync<string>($"select Model from BikeModel where Year >= {range.StartYear}
+                                                 and Year <= {range.EndYear} and Maker == {m}") |> Async.AwaitTask
         return result
     }
 
@@ -79,15 +89,25 @@ let addBikeToSearch (bike: BikeRange) (user : DbUser) =
          let! id = getBikeIdFromRange bike connection
          let asList = id.AsList()
          if (asList.Count > 0) then
-             let userId = asList.[0]
+             let bikeId = asList.[0]
              let! _ = connection.ExecuteScalarAsync($"insert into BikesForUser (User, BikeModel, StartYear, EndYear)
-                                                      values ('{user.id}','{userId}','{bike.StartYear}','{bike.EndYear}');")
+                                                      values ('{user.id}','{bikeId}','{bike.StartYear}','{bike.EndYear}');")
                                  |> Async.AwaitTask
              ()
     }
 
 
+let getUserBikes (user:DbUser) =
+    async {
 
+         use connection = new MySqlConnection(getSettings.connectionString)
+         let! userBikes = connection.QueryAsync<DbBikeRange>($"select StartYear, EndYear, BM.Model as Model, BM.Maker as Maker from BikesForUser
+                                            join BikeModel BM on BM.id = BikesForUser.BikeModel
+                                            join User U on U.id = BikesForUser.User
+                                            where U.id = '{user.id}';")
+                                 |> Async.AwaitTask
+         return userBikes.AsList().ToArray() |> Array.map ConvertToBikeRange  |> Array.choose id
+    }
 
 
 let getBikesForUsers()=

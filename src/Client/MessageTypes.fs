@@ -11,6 +11,8 @@ type RegisterState =
      | RegisterResult of LoginResult
      | ValidateToken of bool
      | TryValidateToken of string
+     | GetBikesForUser
+     | UserBikesResult of Result<BikeRange[],AuthError>
 
 type ViewUpdateState =
      | SetEmail of string

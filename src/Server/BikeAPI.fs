@@ -10,6 +10,7 @@ open Server.Types
 open Shared
 open FSharp.Control.Tasks.V2
 open DbTypes
+open Database
 
 let options = JsonSerializerOptions()
 options.Converters.Add(JsonFSharpConverter())
@@ -110,12 +111,8 @@ let createAllRequests (uri:string -> string) =
 let getBikeModelsForRange  (input:BikeRange) =
 
     async{
-        let request = createUriByParams input
-        let! info = createAllRequests request  |> Async.Parallel
-
-        let result = info |> Seq.collect id |> Seq.choose id  |> Seq.map (fun b -> b.Model)
-                               |> Seq.distinctBy (fun b -> b.Trim()) |> Seq.toArray
-        return result
+        let! bikesFromDb = getModelsForRange input
+        return bikesFromDb |> Seq.toArray
     }
 
 
