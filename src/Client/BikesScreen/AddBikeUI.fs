@@ -16,6 +16,10 @@ let getCurrentManufacturer (model : Model) =
     match model.SelectedManufacturer with
     | Some m -> m
     | None -> "Select Maker"
+let getCurrentSelectedModel (model : Model) =
+    match model.SelectedModel with
+    | Some m -> m
+    | None -> "Select Model"
 
 let createManufacturerDropdown (model : Model) (dispatch: Msg2 -> unit) =
     let cases = FSharpType.GetUnionCases typeof<Manufacturer>
@@ -45,7 +49,7 @@ let createModelsDropdown (model:Model) (dispatch: Msg2 -> unit) =
                          ] [
         Dropdown.trigger [] [
             Button.button [] [
-                span [] [ str "Select Model" ]
+                span [] [ str (getCurrentSelectedModel model) ]
                 Icon.icon [ Icon.Size IsSmall ] [
                     Fa.i [ Fa.Solid.AngleDown ] []
                 ]
@@ -102,10 +106,14 @@ let GetEndYear (model:Model) (range: BikeRange option) =
     |Some m, Some r ->
           Some {r with EndYear = m}
     | _ -> None
-
+let GetSelectedBikeModel (model:Model) (range: BikeRange option) =
+    match (model.SelectedModel, range) with
+    |Some m, Some r ->
+          Some {r with Model = m}
+    | _ -> None
 
 let GetBikeRange (model:Model) =
-   GetMaker model |> GetStartYear model |> GetEndYear model
+   GetMaker model |> GetStartYear model |> GetEndYear model |> GetSelectedBikeModel model
 
 let AddBikeEvent (model: Model) (dispatch: Msg2 -> unit)=
     match GetBikeRange(model) with

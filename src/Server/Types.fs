@@ -16,11 +16,12 @@ module DbTypes =
           Year: System.Int16
          }
 
-    type DbBikeRange = {
+    type DbBikeRange =
+          {
           Maker: System.String
           Model: System.String
-          StartYear: System.Int16
-          EndYear: System.Int16
+          StartYear: System.Int32
+          EndYear: System.Int32
     }
 
     let ConvertToBikeRange (input:DbBikeRange) : BikeRange option=
@@ -32,3 +33,5 @@ module DbTypes =
     let ConvertFromTuple(tuple:string*Manufacturer*int) =
         let model,maker,year = tuple
         {Maker= BikeRangeHelper.ManufacturerToString(maker); Model = model; Year = System.Convert.ToInt16 year}
+
+type UserInfo =    { Email : string }

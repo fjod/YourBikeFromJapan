@@ -67,46 +67,63 @@ let uploadAuctionData (bikes : Bike seq) =
 let getBikeIdFromRange (bike:BikeRange) (connection : MySqlConnection)=
     async {
         let m = BikeRangeHelper.ManufacturerToString bike.Maker
-        let! result = connection.QueryAsync<int>($"select id from BikeModel where Year >= {bike.StartYear}
-                                                 and Year <= {bike.EndYear} and Model == {bike.Model} and Maker == {m}") |> Async.AwaitTask
+        let goodData = dict [ "StartYear", box  bike.StartYear; "EndYear",box  bike.EndYear; "Maker" , box m; "Model", box bike.Model]
+        let! result = connection.QueryAsync<int>($"select id from BikeModel where Year >= @StartYear
+                                                 and Year <= @EndYear and Model = @Model and Maker = @Maker",goodData) |> Async.AwaitTask
         return result
     }
 
 let getModelsForRange(range:BikeRange)=
     async {
-        use connection = new MySqlConnection(getSettings.connectionString)
-        let m = BikeRangeHelper.ManufacturerToString range.Maker
-        let! result = connection.QueryAsync<string>($"select Model from BikeModel where Year >= {range.StartYear}
-                                                 and Year <= {range.EndYear} and Maker == {m}") |> Async.AwaitTask
-        return result
+        try
+            use connection = new MySqlConnection(getSettings.connectionString)
+            let m = BikeRangeHelper.ManufacturerToString range.Maker
+            let! result = connection.QueryAsync<string>($"select Model from BikeModel where Year >= {range.StartYear}
+                                                     and Year <= {range.EndYear} and Maker = '{m}'") |> Async.AwaitTask
+            return result
+         with
+             | :? Exception as e  ->
+                                     printfn "%s" e.Message
+                                     return  List<string>() :> IEnumerable<string>
     }
 
 
 let addBikeToSearch (bike: BikeRange) (user : DbUser) =
    async{
-
-         use connection = new MySqlConnection(getSettings.connectionString)
-         let! id = getBikeIdFromRange bike connection
-         let asList = id.AsList()
-         if (asList.Count > 0) then
-             let bikeId = asList.[0]
-             let! _ = connection.ExecuteScalarAsync($"insert into BikesForUser (User, BikeModel, StartYear, EndYear)
-                                                      values ('{user.id}','{bikeId}','{bike.StartYear}','{bike.EndYear}');")
-                                 |> Async.AwaitTask
-             ()
+         try
+             use connection = new MySqlConnection(getSettings.connectionString)
+             let! id = getBikeIdFromRange bike connection
+             let asList = id.AsList()
+             if (asList.Count > 0) then
+                 let bikeId = asList.[0]
+                 let goodData = dict ["UserId", box user.id; "BikeId", box bikeId; "StartYear", box  bike.StartYear; "EndYear",box  bike.EndYear ]
+                 let! _ = connection.ExecuteScalarAsync($"insert into BikesForUser (User, BikeModel, StartYear, EndYear)
+                                                          values (@UserId, @BikeId , @StartYear, @EndYear);",goodData)
+                                     |> Async.AwaitTask
+                 ()
+          with
+             | :? Exception as e  ->
+                                     printfn "%s" e.Message
+                                     ()
     }
 
+let test = "select * from test"
 
 let getUserBikes (user:DbUser) =
     async {
-
-         use connection = new MySqlConnection(getSettings.connectionString)
-         let! userBikes = connection.QueryAsync<DbBikeRange>($"select StartYear, EndYear, BM.Model as Model, BM.Maker as Maker from BikesForUser
-                                            join BikeModel BM on BM.id = BikesForUser.BikeModel
-                                            join User U on U.id = BikesForUser.User
-                                            where U.id = '{user.id}';")
-                                 |> Async.AwaitTask
-         return userBikes.AsList().ToArray() |> Array.map ConvertToBikeRange  |> Array.choose id
+         try
+             use connection = new MySqlConnection(getSettings.connectionString)
+             let goodData = dict ["UserId", box user.id ]
+             let! userBikes = connection.QueryAsync<DbBikeRange>("select BM.Maker as Maker, BM.Model as Model, StartYear, EndYear  from BikesForUser
+                                                join BikeModel BM on BM.id = BikesForUser.BikeModel
+                                                join User U on U.id = BikesForUser.User
+                                                where U.id = @UserId;",goodData)
+                                     |> Async.AwaitTask
+             return userBikes.AsList().ToArray() |> Array.map ConvertToBikeRange  |> Array.choose id
+         with
+             | :? Exception as e  ->
+                                     printfn "%s" e.Message
+                                     return [||]
     }
 
 

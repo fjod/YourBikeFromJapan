@@ -1,12 +1,13 @@
 ﻿module Server.WelcomeScreen
 
 
+open Server.Types
 open Shared
 open Database
 open Security
 
 let createTokenForUser e =
-    let appUser = { email = e }
+    let appUser : UserInfo = { Email = e }
     encodeJwt appUser
 
 

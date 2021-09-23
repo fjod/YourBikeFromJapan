@@ -28,11 +28,20 @@ let addBikeFun (input:string*BikeRange) =
 
 
 let getBikeModels (input:string*BikeRange) =
-     getBikeModelsForRange (snd input)
+     async {
+       let checkToken = validateJwt (fst input)
+       match checkToken with
+       | Some u ->
+             let! r =  getBikeModelsForRange (snd input)
+             return Ok r
+       | None ->
+              return Error TokenInvalid
+   }
 
 
 
 let getUserBikesFun (input:string) =
+
     async {
            let checkToken = validateJwt input
            match checkToken with

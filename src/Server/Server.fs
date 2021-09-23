@@ -40,6 +40,6 @@ let app =
     }
 
 //fire-and-forget function
-prefill() |> Async.Start
+//prefill() |> Async.Start
 
 run app

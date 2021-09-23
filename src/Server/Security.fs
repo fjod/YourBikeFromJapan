@@ -6,8 +6,8 @@ open System.Security.Cryptography
 open System.Text
 open System.Text.Json
 open Shared
+open Types
 
-type UserInfo =    { Email : string }
 let createRandomKey() =
     let generator = System.Security.Cryptography.RandomNumberGenerator.Create()
     let randomKey = Array.init 32 byte
@@ -29,8 +29,8 @@ let private decodeString (jwt : string) =
 
 let encodeJwt token = JsonSerializer.Serialize token |> encodeString
 
-let decodeJwt<'a> (jwt : string) : 'a =
-    decodeString jwt |> JsonSerializer.Deserialize<'a>
+let decodeJwt (jwt : string) : UserInfo =
+    decodeString jwt |> JsonSerializer.Deserialize<UserInfo>
 
 // I dont think it validates anything
 let validateJwt (jwt : string) : UserInfo option =

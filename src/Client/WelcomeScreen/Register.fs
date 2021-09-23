@@ -31,8 +31,8 @@ let workWithRegister (model: Model) (msg: RegisterState) (todosApi: ITodosApi) :
         | _ ->  model, Cmd.none
     |  UserBikesResult bikes->
         match bikes with
-        | Ok b ->  {model with UserRequestedBikes = b}, Cmd.none
-        | Error e -> model, Cmd.none
+        | Ok b ->  {model with UserRequestedBikes = b; State = BikesScreen}, Cmd.none
+        | Error e -> {model with State = BikesScreen}, Cmd.none
     | TryValidateToken token ->
           let ret = Cmd.OfAsync.perform todosApi.validateToken token RegisterState.ValidateToken
           model,ret

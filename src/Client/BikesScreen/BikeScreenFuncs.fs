@@ -37,4 +37,7 @@ let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi)
             {model with UserRequestedBikes = test}, Cmd.none //user added bike; display it somewhere ?
        | Error _ ->    model,   Cmd.none
    | ReturnedModels models ->
-       {model with Models = models}, Cmd.none
+       match models with
+       | Ok m ->
+            {model with Models = m}, Cmd.none
+       | Error _ ->    model,   Cmd.none

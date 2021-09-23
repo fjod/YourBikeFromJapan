@@ -23,6 +23,6 @@ type BikeScreenState =
     | SelectedModel of string
     | SetStartYear of string
     | SetEndYear of string
-    | ReturnedModels of string[]
+    | ReturnedModels of Result<string[],AuthError>
     | AddBike of BikeRange
     | BikeAdded of Result<BikeRange,AuthError>
