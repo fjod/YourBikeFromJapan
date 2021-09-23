@@ -177,5 +177,30 @@ let fillBikeModelTable(vals: DbTypes.DbBikeModel seq) =
                                      return  ()
    }
 
+let bikesKeys =
+    async {
 
+             use connection = new MySqlConnection(getSettings.connectionString)
+             connection.Open ()
+             let! result = connection.QueryAsync<string>("select BikeKey from AuctionData")
+                           |> Async.AwaitTask
+             connection.Close ()
+             return result
+    }
+
+//rewrite using packet upload as in fillBikeModelTable
+let insertWithMemo(bikes : Bike seq) =
+    async{
+        let sb =  StringBuilder("insert into AuctionData (Manufacturer, Mileage, Img, Year, Model, BikeKey, ScrapedAt) values ")
+        let! list = bikesKeys
+        let asList = list.AsList()
+        bikes |> Seq.filter (fun b -> asList.Contains(b.Key) |> not) |>
+                 Seq.iter   (fun b -> sb.Append($" ('{b.Manufacturer}','{b.Mileage}','{b.Image}','{b.Year}','{b.Model.Replace(''',' ')}','{b.Key}','{DateTime.Now.Date}'),") |> ignore)
+
+        use connection = new MySqlConnection(getSettings.connectionString)
+        connection.Open ()
+        let! _ = connection.ExecuteScalarAsync(sb.Remove(sb.Length-1,1).Append(";").ToString())    |> Async.AwaitTask
+        connection.Close ()
+        ()
+    }
 

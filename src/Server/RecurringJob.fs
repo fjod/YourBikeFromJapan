@@ -42,3 +42,30 @@ let prefill() =
         ()
 
     }
+
+let wait15AndCall(range:BikeRange) =
+    async {
+    Console.Write "waiting with range"
+    Console.WriteLine range.Maker
+    let timer = new Timers.Timer(15000.)
+    let event = Async.AwaitEvent timer.Elapsed |> Async.Ignore
+    let! r = getAuctDataForRange range
+    Console.Write "got info for range"
+    Console.WriteLine range.Maker
+    return r
+}
+
+let fillAuctData()=
+    async{
+    let (yamahaRange:BikeRange) = {Maker = Yamaha; Model = ""; StartYear = "2000"; EndYear = "2020"}
+    let kawaRange = {yamahaRange with Maker = Kawasaki}
+    let hondaRange = {yamahaRange with Maker = Honda}
+    let sRange = {yamahaRange with Maker = Suzuki}
+    let ranges = [|yamahaRange;kawaRange;hondaRange;sRange|]
+
+    for range in ranges do
+        let! models = wait15AndCall range
+        let! _ = insertWithMemo models
+        ()
+
+    }
