@@ -57,7 +57,7 @@ let wait15AndCall(range:BikeRange) =
 
 let fillAuctData()=
     async{
-    let (yamahaRange:BikeRange) = {Maker = Yamaha; Model = ""; StartYear = "2000"; EndYear = "2020"}
+    let (yamahaRange:BikeRange) = {Maker = Yamaha; Model = ""; StartYear = "1990"; EndYear = DateTime.Now.Year.ToString()}
     let kawaRange = {yamahaRange with Maker = Kawasaki}
     let hondaRange = {yamahaRange with Maker = Honda}
     let sRange = {yamahaRange with Maker = Suzuki}

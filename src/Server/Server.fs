@@ -41,5 +41,6 @@ let app =
 
 //fire-and-forget function
 //prefill() |> Async.Start
+//fillAuctData() |> Async.Start
 
 run app

@@ -134,6 +134,5 @@ let getAuctDataForRange(input:BikeRange) =
          let request = createUriByParams input
          let! info = createAllRequests request  |> Async.Parallel
          let result =  info   |> Seq.collect id |> Seq.choose id
-                               |> Seq.distinctBy (fun b-> b.Model.Trim())
          return result
     }

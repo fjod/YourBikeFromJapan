@@ -171,7 +171,7 @@ let fillBikeModelTable(vals: DbTypes.DbBikeModel seq) =
                connection.Close ()
                Console.WriteLine " finished upload to db"
                return ()
-            with
+           with
             | :? Exception as e  ->
                                      printfn "%s" e.Message
                                      return  ()
@@ -188,19 +188,25 @@ let bikesKeys =
              return result
     }
 
-//rewrite using packet upload as in fillBikeModelTable
 let insertWithMemo(bikes : Bike seq) =
     async{
-        let sb =  StringBuilder("insert into AuctionData (Manufacturer, Mileage, Img, Year, Model, BikeKey, ScrapedAt) values ")
-        let! list = bikesKeys
-        let asList = list.AsList()
-        bikes |> Seq.filter (fun b -> asList.Contains(b.Key) |> not) |>
-                 Seq.iter   (fun b -> sb.Append($" ('{b.Manufacturer}','{b.Mileage}','{b.Image}','{b.Year}','{b.Model.Replace(''',' ')}','{b.Key}','{DateTime.Now.Date}'),") |> ignore)
+        try
+            let sb =  StringBuilder("insert into AuctionData (Manufacturer, Mileage, Img, Year, Model, BikeKey, ScrapedAt) values ")
+            let! list = bikesKeys
+            let asList = list.AsList()
+            let formattedTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            bikes |> Seq.filter (fun b -> asList.Contains(b.Key) |> not) |>
+                     Seq.iter   (fun b -> sb.Append($" ('{b.Manufacturer}','{b.Mileage}','{b.Image}','{b.Year}','{b.Model.Replace(''',' ')}','{b.Key}','{formattedTime}'),") |> ignore)
 
-        use connection = new MySqlConnection(getSettings.connectionString)
-        connection.Open ()
-        let! _ = connection.ExecuteScalarAsync(sb.Remove(sb.Length-1,1).Append(";").ToString())    |> Async.AwaitTask
-        connection.Close ()
-        ()
+            use connection = new MySqlConnection(getSettings.connectionString)
+            connection.Open ()
+            let! _ = connection.ExecuteScalarAsync(sb.Remove(sb.Length-1,1).Append(";").ToString())    |> Async.AwaitTask
+            connection.Close ()
+            Console.WriteLine " finished upload bikes to db"
+            ()
+        with
+            | :? Exception as e  ->
+                                     printfn "%s" e.Message
+                                     return  ()
     }
 
