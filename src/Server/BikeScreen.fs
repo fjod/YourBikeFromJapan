@@ -57,3 +57,21 @@ let getUserBikesFun (input:string) =
            | None ->
                   return Error TokenInvalid
        }
+
+let getAuctData(input:string*BikeRange) =
+     async {
+       let checkToken = validateJwt (fst input)
+       match checkToken with
+       | Some u ->
+                   let! user = getUserByEmail u.Email
+                   match user with
+                   | Ok u ->
+                       let range = snd input
+                       let! data = auctDataForRange range
+                       return Ok data
+                   | Error _ ->
+                       return Error NoUserForEmail
+
+       | None ->
+              return Error TokenInvalid
+   }

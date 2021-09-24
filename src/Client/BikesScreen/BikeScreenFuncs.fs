@@ -41,3 +41,16 @@ let workBikeScreenUi (model: Model) (msg: BikeScreenState) (todosApi: ITodosApi)
        | Ok m ->
             {model with Models = m}, Cmd.none
        | Error _ ->    model,   Cmd.none
+
+   | SelectedAuctDate date -> {model with SelectedDate = Some date},Cmd.none
+   | GetAuctData bike ->
+           match findTokenValue() with
+               | Ok t ->
+                    let result = Cmd.OfAsync.perform todosApi.getAuctDataForRange (t,bike)  BikeScreenState.AuctData
+                    model, result
+               | Error e ->  model, Cmd.none
+   |AuctData data ->
+       match data with
+       | Ok m ->
+            {model with AuctData = m}, Cmd.none
+       | Error _ ->    model,   Cmd.none

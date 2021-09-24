@@ -210,3 +210,24 @@ let insertWithMemo(bikes : Bike seq) =
                                      return  ()
     }
 
+let auctDataForRange(range :BikeRange) =
+    async {
+         try
+             use connection = new MySqlConnection(getSettings.connectionString)
+             let goodData = dict [
+                 "model", box range.Model
+                 "EndYear", box range.EndYear
+                 "StartYear", box range.StartYear
+             ]
+             let! userBikes = connection.QueryAsync<AuctionData>("select Model,       Year,       BikeKey,       Img,
+                            Mileage,       ScrapedAt,  Manufacturer from AuctionData where Model = @model and Year <= @EndYear and Year >= @StartYear;",goodData)
+                                     |> Async.AwaitTask
+             return userBikes.AsList().ToArray()
+         with
+             | :? Exception as e  ->
+                                     printfn "%s" e.Message
+                                     return [||]
+    }
+
+    //таблица user id : auct data id
+    //её используем для отправки емейлов по новым байкам

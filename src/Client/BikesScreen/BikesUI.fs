@@ -21,17 +21,14 @@ let containerBikes (model: Model) (dispatch: Msg2 -> unit) =
                 ]
             ] //1st column
             Bulma.column[
-                column.is2
+                column.is3
                 prop.children [
-                    Bulma.button.button [
-                        Bulma.color.isSuccess
-                        prop.text "All data"
-                    ]
-                    containerBikesHistory(model)
+
+                    containerBikesHistory model dispatch
                 ]
             ]//2rd column
             Bulma.column[
-                column.is8
+                column.is3
                 prop.children [
                    containerAuctData(model)
                    ]

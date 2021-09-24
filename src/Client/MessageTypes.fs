@@ -1,5 +1,6 @@
 ﻿module Client.MessageTypes
 
+open System
 open Shared
 
 type LoginState =
@@ -20,9 +21,12 @@ type ViewUpdateState =
 
 type BikeScreenState =
     | SelectedManufacturerName of string
+    | SelectedAuctDate of DateTime
     | SelectedModel of string
     | SetStartYear of string
     | SetEndYear of string
     | ReturnedModels of Result<string[],AuthError>
     | AddBike of BikeRange
     | BikeAdded of Result<BikeRange,AuthError>
+    | GetAuctData of BikeRange
+    | AuctData of Result<AuctionData[],AuthError>

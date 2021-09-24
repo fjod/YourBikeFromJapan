@@ -21,6 +21,7 @@ let todosApi =
       addBike = fun data -> async {return! addBikeFun(data) }
       getBikesFromRange = fun data -> async { return! getBikeModels(data) }
       getBikesForUser = fun data -> async {return! getUserBikesFun(data)}
+      getAuctDataForRange = fun data -> async {return! getAuctData(data)}
     }
 
 let webApp =

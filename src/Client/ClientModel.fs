@@ -1,5 +1,6 @@
 ﻿module Client.ClientModel
 
+open System
 open Shared
 
 type UIState =
@@ -21,6 +22,9 @@ type Model = {
     SelectedManufacturer : string option
     Models: string[]
     SelectedModel: string option
+
+    SelectedDate: DateTime option
+    AuctData : AuctionData[]
 }
 
 let BikeRangeFromModel (m:Model) : BikeRange option =

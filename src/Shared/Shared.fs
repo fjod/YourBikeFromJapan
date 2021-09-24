@@ -82,6 +82,17 @@ type DbUser = {
     salt : string
 }
 
+[<CLIMutable>]
+type AuctionData = {
+    Manufacturer : System.String
+    Mileage : System.Int32
+    Img : System.String
+    Year : System.Int32
+    BikeKey : System.String
+    ScrapedAt: System.DateTime
+    Model : System.String
+}
+
 type ITodosApi =
     { login: LoginInfo -> Async<LoginResult>
       register: LoginInfo -> Async<LoginResult>
@@ -89,14 +100,8 @@ type ITodosApi =
       addBike: string*BikeRange ->Async<Result<BikeRange,AuthError>> //return range of bikes and save it to model
       getBikesFromRange:string*BikeRange->Async<Result<string[],AuthError>>
       getBikesForUser:string->Async<Result<BikeRange[],AuthError>>
+      getAuctDataForRange:string*BikeRange ->Async<Result<AuctionData[],AuthError>>
     }
 
-type AuctionData = {
-    id : int
-    Manufacturer : string
-    Mileage : int
-    Img : string
-    Year : int
-    BikeKey : string
-}
+
 
