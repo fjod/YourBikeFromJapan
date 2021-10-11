@@ -2,6 +2,7 @@
 open System
 open FSharp.Control.Tasks
 
+open FsToolkit.ErrorHandling.Operator.AsyncResult
 open Shared
 open BikeAPI
 open Security
@@ -57,8 +58,8 @@ let getUserBikesFun (input:string) =
 
 let test(input:string*BikeRange)=
     asyncResult {
-        let! checkToken = (fst input) |> validateJwt
-        do! checkToken.Email |> getUserByEmail |> Async.Ignore
+        let! token =  (fst input) |> validateJwt |> Result.map (fun r -> r.Email)
+        let! _ = token |> getUserByEmail
         return! snd input |> auctDataForRange
         }
 

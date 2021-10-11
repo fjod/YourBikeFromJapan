@@ -19,7 +19,7 @@ let login  (data : LoginInfo) =
            let token = createTokenForUser data.Email
            return {  Message=Some "User found"; Token= Some token}
         | Error e ->
-           return {  Message=Some e; Token= None }
+           return {  Message=Some "Auth Error"; Token= None }
    }
 let register  (data : LoginInfo)  =
    async {

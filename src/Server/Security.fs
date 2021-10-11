@@ -33,11 +33,11 @@ let decodeJwt (jwt : string) : UserInfo =
     decodeString jwt |> JsonSerializer.Deserialize<UserInfo>
 
 
-let validateJwt (jwt : string) :  Result<UserInfo,string> =
+let validateJwt (jwt : string) =
     try
         let token = decodeJwt jwt
         Ok token
-    with _ -> Error "bad token"
+    with _ -> Error TokenInvalid
 
 let utf8Bytes (input : string) = Encoding.UTF8.GetBytes(input)
 let base64 (input : byte []) = Convert.ToBase64String(input)
@@ -55,8 +55,8 @@ let verifyPassword password saltBase64 hashBase64 =
 let authorize (f : 'u -> UserInfo -> 't) : SecureRequest<'u> -> SecureResponse<'t> =
     fun request ->
         match validateJwt request.Token with
-        | None -> async { return Result.Error AuthError.TokenInvalid }
-        | Some user ->
+        | Error _ -> async { return Result.Error AuthError.TokenInvalid }
+        | Ok user ->
                 async {
                     let output = f request.Body user
                     return Result.Ok output
