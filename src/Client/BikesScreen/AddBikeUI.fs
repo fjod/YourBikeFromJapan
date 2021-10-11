@@ -12,6 +12,7 @@ open Fable.FontAwesome
 open Microsoft.FSharp.Reflection
 open Client.MessageTypes
 
+
 let getCurrentManufacturer (model : Model) =
     match model.SelectedManufacturer with
     | Some m -> m

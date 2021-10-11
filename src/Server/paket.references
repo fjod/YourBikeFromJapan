@@ -6,3 +6,4 @@ FsConfig
 Dapper.FSharp
 TaskBuilder.fs
 FSharp.SystemTextJson
+FsToolkit.ErrorHandling

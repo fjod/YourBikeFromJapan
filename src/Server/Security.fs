@@ -32,12 +32,12 @@ let encodeJwt token = JsonSerializer.Serialize token |> encodeString
 let decodeJwt (jwt : string) : UserInfo =
     decodeString jwt |> JsonSerializer.Deserialize<UserInfo>
 
-// I dont think it validates anything
-let validateJwt (jwt : string) : UserInfo option =
+
+let validateJwt (jwt : string) :  Result<UserInfo,string> =
     try
         let token = decodeJwt jwt
-        Some token
-    with _ -> None
+        Ok token
+    with _ -> Error "bad token"
 
 let utf8Bytes (input : string) = Encoding.UTF8.GetBytes(input)
 let base64 (input : byte []) = Convert.ToBase64String(input)

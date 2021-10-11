@@ -10,7 +10,7 @@ let (|NotNull|_|) input =
 let convert input =
            match input with
            | NotNull o -> Ok o
-           | _ -> Error "not found"
+           | _ -> Error NoUserForEmail
 
 let test ()=
     let z = { id =1;    email ="";    password = "";    salt = ""}

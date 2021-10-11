@@ -6,13 +6,14 @@ open Shared
 open BikeAPI
 open Security
 open Database
+open FsToolkit.ErrorHandling
 
 let addBikeFun (input:string*BikeRange) =
 
    async {
        let checkToken = validateJwt (fst input)
        match checkToken with
-       | Some u ->
+       | Ok u ->
                    let! user = getUserByEmail u.Email
                    match user with
                    | Ok u ->
@@ -22,30 +23,26 @@ let addBikeFun (input:string*BikeRange) =
                    | Error _ ->
                        return Error NoUserForEmail
 
-       | None ->
+       | Error _ ->
               return Error TokenInvalid
    }
-
 
 let getBikeModels (input:string*BikeRange) =
      async {
        let checkToken = validateJwt (fst input)
        match checkToken with
-       | Some u ->
+       | Ok u ->
              let! r =  getBikeModelsForRange (snd input)
              return Ok r
-       | None ->
+       | Error _ ->
               return Error TokenInvalid
    }
 
-
-
 let getUserBikesFun (input:string) =
-
     async {
            let checkToken = validateJwt input
            match checkToken with
-           | Some u ->
+           | Ok u ->
                        let! user = getUserByEmail u.Email
                        match user with
                        | Ok u ->
@@ -54,15 +51,22 @@ let getUserBikesFun (input:string) =
                        | Error _ ->
                            return Error NoUserForEmail
 
-           | None ->
+           | Error _ ->
                   return Error TokenInvalid
        }
+
+let test(input:string*BikeRange)=
+    asyncResult {
+        let! checkToken = (fst input) |> validateJwt
+        do! checkToken.Email |> getUserByEmail |> Async.Ignore
+        return! snd input |> auctDataForRange
+        }
 
 let getAuctData(input:string*BikeRange) =
      async {
        let checkToken = validateJwt (fst input)
        match checkToken with
-       | Some u ->
+       | Ok  u ->
                    let! user = getUserByEmail u.Email
                    match user with
                    | Ok u ->
@@ -72,6 +76,6 @@ let getAuctData(input:string*BikeRange) =
                    | Error _ ->
                        return Error NoUserForEmail
 
-       | None ->
+       | Error _ ->
               return Error TokenInvalid
    }
